@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEDIFIND - 3D Beating Heart Background</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #06090e;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* 3D Canvas Background */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Foreground Content */
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    /* Audio Toggle Button */
+    .audio-toggle {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      z-index: 10;
+      background: rgba(6, 9, 14, 0.7);
+      border: 1px solid #ff1744;
+      color: #ff1744;
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 15px rgba(255, 23, 68, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .audio-toggle:hover {
+      background: rgba(255, 23, 68, 0.2);
+      box-shadow: 0 0 25px rgba(255, 23, 68, 0.6);
+      transform: scale(1.05);
+    }
+
+    .audio-toggle.active {
+      background: #ff1744;
+      color: #ffffff;
+      box-shadow: 0 0 25px rgba(255, 23, 68, 0.8);
+    }
+
+    /* Logo Styling */
+    .logo-box {
+      width: 110px;
+      height: 110px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      filter: drop-shadow(0 0 20px rgba(0, 230, 118, 0.65));
+    }
+
+    .logo-box svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* App Title */
+    .title {
+      color: #00e676;
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 48px;
+      font-style: italic;
+      font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+      text-shadow: 0 0 22px rgba(0, 230, 118, 0.7);
+    }
+
+    /* Button Styling */
+    .btn-enter {
+      background-color: #00e676;
+      color: #06090e;
+      border: none;
+      padding: 16px 44px;
+      border-radius: 50px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(0, 230, 118, 0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-enter:hover {
+      transform: scale(1.04);
+      background-color: #00ff87;
+      box-shadow: 0 0 35px rgba(0, 230, 118, 0.85);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Three.js Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Audio Toggle Control -->
+  <button id="audio-btn" class="audio-toggle">
+    <span id="audio-icon">🔇</span>
+    <span id="audio-text">Audio: Off</span>
+  </button>
+
+  <!-- UI Interface Layer -->
+  <div class="container">
+    <div class="logo-box">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 40 10 H 60 V 30 H 80 V 50 H 60 V 70 H 40 V 50 H 20 V 30 H 40 Z" fill="#00e676" />
+        <circle cx="50" cy="40" r="16" fill="#06090e" />
+        <circle cx="50" cy="40" r="13" fill="none" stroke="#00e676" stroke-width="3" />
+        <path d="M 50 30 Q 50 40 60 40 Q 50 40 50 50 Q 50 40 40 40 Q 50 40 50 30 Z" fill="#00e676" />
+        <rect x="61" y="53" width="9" height="24" rx="4.5" transform="rotate(-45 61 53)" fill="#00e676" />
+      </svg>
+    </div>
+
+    <h1 class="title">MEDIFIND</h1>
+
+    <button class="btn-enter">Enter Platform</button>
+  </div>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // --- 1. Web Audio API Synthesizer ---
+    let audioCtx = null;
+    let isAudioEnabled = false;
+    let lastBeatTriggerTime = 0;
+
+    const audioBtn = document.getElementById('audio-btn');
+    const audioIcon = document.getElementById('audio-icon');
+    const audioText = document.getElementById('audio-text');
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playHeartbeatSound() {
+      if (!isAudioEnabled || !audioCtx) return;
+
+      const now = audioCtx.currentTime;
+
+      // "LUB"
+      const osc1 = audioCtx.createOscillator();
+      const gain1 = audioCtx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(55, now);
+      osc1.frequency.exponentialRampToValueAtTime(25, now + 0.12);
+      gain1.gain.setValueAtTime(0.8, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc1.connect(gain1);
+      gain1.connect(audioCtx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.12);
+
+      // "DUB"
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(75, now + 0.13);
+      osc2.frequency.exponentialRampToValueAtTime(30, now + 0.23);
+      gain2.gain.setValueAtTime(0, now);
+      gain2.gain.setValueAtTime(0.6, now + 0.13);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+      osc2.start(now + 0.13);
+      osc2.stop(now + 0.23);
+    }
+
+    audioBtn.addEventListener('click', () => {
+      initAudio();
+      isAudioEnabled = !isAudioEnabled;
+
+      if (isAudioEnabled) {
+        audioBtn.classList.add('active');
+        audioIcon.textContent = '🔊';
+        audioText.textContent = 'Audio: On';
+        playHeartbeatSound();
+      } else {
+        audioBtn.classList.remove('active');
+        audioIcon.textContent = '🔇';
+        audioText.textContent = 'Audio: Off';
+      }
+    });
+
+    // --- 2. Three.js Scene & Lighting ---
+    const canvas = document.getElementById('bg-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 75);
+
+    // Dynamic Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    scene.add(ambientLight);
+
+    const redLight = new THREE.PointLight(0xff1744, 4, 120);
+    redLight.position.set(30, 20, 40);
+    scene.add(redLight);
+
+    const greenLight = new THREE.PointLight(0x00e676, 2.5, 120);
+    greenLight.position.set(-35, -20, 30);
+    scene.add(greenLight);
+
+    // --- 3. Procedural 3D Heart Mesh ---
+    const heartGroup = new THREE.Group();
+
+    // 2D Extruded Heart Geometry
+    const heartShape = new THREE.Shape();
+    heartShape.moveTo(0, 0);
+    heartShape.bezierCurveTo(0, -3, -5, -15, -25, -15);
+    heartShape.bezierCurveTo(-55, -15, -55, 22.5, -55, 22.5);
+    heartShape.bezierCurveTo(-55, 40, -35, 62, 0, 80);
+    heartShape.bezierCurveTo(35, 62, 55, 40, 55, 22.5);
+    heartShape.bezierCurveTo(55, 22.5, 55, -15, 25, -15);
+    heartShape.bezierCurveTo(10, -15, 0, -3, 0, 0);
+
+    const extrudeSettings = {
+      depth: 18,
+      bevelEnabled: true,
+      bevelSegments: 12,
+      steps: 5,
+      bevelSize: 12,
+      bevelThickness: 12
+    };
+
+    const heartGeo = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+    heartGeo.center(); // Center local pivot point
+
+    // Solid Inner Glowing Material
+    const heartMat = new THREE.MeshPhongMaterial({
+      color: 0xcc0029,
+      emissive: 0x550011,
+      specular: 0xff6688,
+      shininess: 80,
+      transparent: true,
+      opacity: 0.85
+    });
+
+    const heartMesh = new THREE.Mesh(heartGeo, heartMat);
+    heartMesh.rotation.x = Math.PI; // Invert upside-down extrusion
+    heartGroup.add(heartMesh);
+
+    // Tech Wireframe Overlay
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0xff1744,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.35
+    });
+    const wireMesh = new THREE.Mesh(heartGeo, wireMat);
+    wireMesh.rotation.x = Math.PI;
+    wireMesh.scale.set(1.02, 1.02, 1.02);
+    heartGroup.add(wireMesh);
+
+    // Position 3D Heart in Scene Background
+    heartGroup.scale.set(0.35, 0.35, 0.35);
+    heartGroup.position.set(0, 0, -10);
+    scene.add(heartGroup);
+
+    // --- 4. 3D RED ECG Heartbeat Line ---
+    const ecgSegments = 400;
+    const ecgPositions = new Float32Array(ecgSegments * 3);
+    const ecgGeometry = new THREE.BufferGeometry();
+    ecgGeometry.setAttribute('position', new THREE.BufferAttribute(ecgPositions, 3));
+
+    const ecgMaterial = new THREE.LineBasicMaterial({
+      color: 0xff1744,
+      linewidth: 3.5,
+      transparent: true,
+      opacity: 0.95,
+      blending: THREE.AdditiveBlending
+    });
+
+    const ecgLine = new THREE.Line(ecgGeometry, ecgMaterial);
+    ecgLine.position.z = 15;
+    scene.add(ecgLine);
+
+    // Glowing Pulse Tracer Dot
+    const tracerGeo = new THREE.SphereGeometry(1.4, 16, 16);
+    const tracerMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 1,
+      blending: THREE.AdditiveBlending
+    });
+    const tracerDot = new THREE.Mesh(tracerGeo, tracerMat);
+    scene.add(tracerDot);
+
+    function getEcgY(phase) {
+      const p = ((phase % 40) + 40) % 40;
+      if (p > 12 && p <= 14) return Math.sin((p - 12) / 2 * Math.PI) * 1.5;     // P wave
+      if (p > 15 && p <= 16) return -2.0;                                        // Q wave
+      if (p > 16 && p <= 18) return (p - 16) == 1 ? 14.0 : -4.0;                // R Peak Spike
+      if (p > 18 && p <= 20) return -3.5 + (p - 18) * 1.75;                     // S wave
+      if (p > 22 && p <= 26) return Math.sin((p - 22) / 4 * Math.PI) * 3.2;     // T wave
+      return 0;
+    }
+
+    // --- 5. Animation Loop ---
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+
+      // --- Realistic Double Heartbeat Pulse Animation ---
+      const beatCycle = (elapsed * 2.2) % (Math.PI * 2);
+      let pulseScale = 0.35; // Base size scale
+
+      if (beatCycle < 0.35) {
+        // First Contraction ("Lub")
+        pulseScale += Math.sin(beatCycle / 0.35 * Math.PI) * 0.07;
+      } else if (beatCycle > 0.45 && beatCycle < 0.75) {
+        // Second Contraction ("Dub")
+        pulseScale += Math.sin((beatCycle - 0.45) / 0.30 * Math.PI) * 0.04;
+      }
+
+      heartGroup.scale.set(pulseScale, pulseScale, pulseScale);
+
+      // Subtle 3D rotation in space
+      heartGroup.rotation.y = Math.sin(elapsed * 0.5) * 0.25;
+      heartGroup.rotation.z = Math.cos(elapsed * 0.3) * 0.1;
+
+      // Update 3D Red ECG Line
+      const ecgAttr = ecgGeometry.attributes.position;
+      const speed = elapsed * 28;
+      const totalWidth = 110;
+
+      let leadX = 0, leadY = 0, leadZ = 0;
+      let peakDetected = false;
+      const tracerSampleIndex = Math.floor(ecgSegments * 0.82);
+
+      for (let i = 0; i < ecgSegments; i++) {
+        const x = (i / ecgSegments) * totalWidth - totalWidth / 2;
+        const phase = x + speed;
+        const y = getEcgY(phase);
+        const z = Math.sin(x * 0.05 + elapsed) * 3;
+
+        ecgAttr.array[i * 3] = x;
+        ecgAttr.array[i * 3 + 1] = y;
+        ecgAttr.array[i * 3 + 2] = z;
+
+        if (i === tracerSampleIndex) {
+          leadX = x;
+          leadY = y;
+          leadZ = z + 15;
+
+          if (y > 8.0) {
+            peakDetected = true;
+          }
+        }
+      }
+      ecgAttr.needsUpdate = true;
+
+      // Sync Audio Pulse
+      if (peakDetected && (elapsed - lastBeatTriggerTime > 0.4)) {
+        playHeartbeatSound();
+        lastBeatTriggerTime = elapsed;
+      }
+
+      // Update Tracer Dot
+      tracerDot.position.set(leadX, leadY, leadZ);
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Window Resize Handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
