@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDIFIND</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at center, #0a1727 0%, #030811 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #ffffff;
+    }
+
+    /* Main Centered Container */
+    .container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      max-width: 320px;
+      transform: translateY(-30px);
+    }
+
+    /* Logo Area Container */
+    .logo-area {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 1. Base Medical Plus Cross Symbol */
+    .plus-symbol {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      color: #00ff88;
+      opacity: 0;
+      filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.4));
+      animation: revealPlus 0.8s ease-out 0.2s forwards;
+    }
+
+    @keyframes revealPlus {
+      0% { opacity: 0; transform: scale(0.6); }
+      100% { opacity: 0.85; transform: scale(1); }
+    }
+
+    /* 2. Individual Search Glass Symbol (Inspects then merges onto Plus) */
+    .search-symbol-standalone {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      color: #00ff88;
+      opacity: 0;
+      filter: drop-shadow(0 0 25px rgba(0, 255, 136, 0.9));
+      animation: searchAndDock 2s cubic-bezier(0.34, 1.3, 0.64, 1) 0.8s forwards;
+    }
+
+    @keyframes searchAndDock {
+      /* Starts off-screen as an individual search tool */
+      0% {
+        opacity: 0;
+        transform: translate(-140px, -90px) scale(1.4) rotate(-25deg);
+      }
+      /* Moves across scanning/searching */
+      35% {
+        opacity: 1;
+        transform: translate(-30px, -40px) scale(1.2) rotate(-10deg);
+      }
+      65% {
+        opacity: 1;
+        transform: translate(25px, -10px) scale(1.1) rotate(10deg);
+      }
+      /* Lands precisely on top of the plus symbol to form the final logo */
+      100% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+    }
+
+    /* 3. Pulse glow when logo completes */
+    .logo-area::after {
+      content: '';
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(0, 255, 136, 0.3);
+      filter: blur(25px);
+      opacity: 0;
+      animation: glowPulse 1s ease-out 2.8s forwards;
+      pointer-events: none;
+    }
+
+    @keyframes glowPulse {
+      0% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 1; transform: scale(1.4); }
+      100% { opacity: 0.5; transform: scale(1.1); }
+    }
+
+    /* Brand Title Reveal */
+    .brand-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #00ff88;
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: revealElement 0.8s ease-out 2.9s forwards;
+    }
+
+    /* Enter Button Reveal */
+    .enter-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #00b359 0%, #00ff88 100%);
+      color: #030811;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(0, 255, 136, 0.45);
+      opacity: 0;
+      transform: translateY(25px);
+      animation: revealElement 0.8s ease-out 3.3s forwards;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .enter-btn:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 0 35px rgba(0, 255, 136, 0.75);
+    }
+
+    .enter-btn:active {
+      transform: translateY(0) !important;
+    }
+
+    @keyframes revealElement {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo-area">
+      <!-- Medical Plus Symbol Layer -->
+      <svg class="plus-symbol" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M41 15H59V41H85V59H59V85H41V59H15V41H41V15Z" fill="currentColor"/>
+      </svg>
+
+      <!-- Individual Magnifying Glass Layer (Searches and attaches) -->
+      <svg class="search-symbol-standalone" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Circular Lens -->
+        <circle cx="53" cy="53" r="22" stroke="#00ff88" stroke-width="5" fill="#0a1727"/>
+        <!-- Handle -->
+        <path d="M69 69L87 87" stroke="#00ff88" stroke-width="6" stroke-linecap="round"/>
+        <!-- Center Sparkle inside lens -->
+        <path d="M53 39C53 46 47 53 40 53C47 53 53 60 53 67C53 60 60 53 67 53C60 53 53 46 53 39Z" fill="#00ff88"/>
+      </svg>
+    </div>
+    
+    <h1 class="brand-title">MEDIFIND</h1>
+
+    <button class="enter-btn">Enter Platform</button>
+  </div>
+
+</body>
+</html>
