@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEDIFIND - 3D Heartbeat Line</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #06090e;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* 3D Canvas Background */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Foreground Content */
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    /* Logo Styling */
+    .logo-box {
+      width: 110px;
+      height: 110px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      filter: drop-shadow(0 0 20px rgba(0, 230, 118, 0.65));
+    }
+
+    .logo-box svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* App Title */
+    .title {
+      color: #00e676;
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 48px;
+      font-style: italic;
+      font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+      text-shadow: 0 0 22px rgba(0, 230, 118, 0.7);
+    }
+
+    /* Button Styling */
+    .btn-enter {
+      background-color: #00e676;
+      color: #06090e;
+      border: none;
+      padding: 16px 44px;
+      border-radius: 50px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(0, 230, 118, 0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-enter:hover {
+      transform: scale(1.04);
+      background-color: #00ff87;
+      box-shadow: 0 0 35px rgba(0, 230, 118, 0.85);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Three.js Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- UI Interface Layer -->
+  <div class="container">
+    <div class="logo-box">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 40 10 H 60 V 30 H 80 V 50 H 60 V 70 H 40 V 50 H 20 V 30 H 40 Z" fill="#00e676" />
+        <circle cx="50" cy="40" r="16" fill="#06090e" />
+        <circle cx="50" cy="40" r="13" fill="none" stroke="#00e676" stroke-width="3" />
+        <path d="M 50 30 Q 50 40 60 40 Q 50 40 50 50 Q 50 40 40 40 Q 50 40 50 30 Z" fill="#00e676" />
+        <rect x="61" y="53" width="9" height="24" rx="4.5" transform="rotate(-45 61 53)" fill="#00e676" />
+      </svg>
+    </div>
+
+    <h1 class="title">MEDIFIND</h1>
+
+    <button class="btn-enter">Enter Platform</button>
+  </div>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    const canvas = document.getElementById('bg-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 70);
+
+    // --- 3D Red ECG Line ---
+    const ecgSegments = 500;
+    const ecgPositions = new Float32Array(ecgSegments * 3);
+    const ecgGeometry = new THREE.BufferGeometry();
+    ecgGeometry.setAttribute('position', new THREE.BufferAttribute(ecgPositions, 3));
+
+    const ecgMaterial = new THREE.LineBasicMaterial({
+      color: 0xff1744, // Bright Crimson Red
+      linewidth: 4,
+      transparent: true,
+      opacity: 0.95,
+      blending: THREE.AdditiveBlending
+    });
+
+    const ecgLine = new THREE.Line(ecgGeometry, ecgMaterial);
+    ecgLine.position.z = 10;
+    scene.add(ecgLine);
+
+    // Glowing Pulse Tracer Dot
+    const tracerGeo = new THREE.SphereGeometry(1.6, 16, 16);
+    const tracerMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 1,
+      blending: THREE.AdditiveBlending
+    });
+    const tracerDot = new THREE.Mesh(tracerGeo, tracerMat);
+    scene.add(tracerDot);
+
+    // ECG Signal Shape Formula
+    function getEcgY(phase) {
+      const p = ((phase % 40) + 40) % 40;
+      if (p > 12 && p <= 14) return Math.sin((p - 12) / 2 * Math.PI) * 2.0;     // P wave
+      if (p > 15 && p <= 16) return -2.5;                                        // Q wave
+      if (p > 16 && p <= 18) return (p - 16) == 1 ? 16.0 : -5.0;                // R Spike
+      if (p > 18 && p <= 20) return -4.0 + (p - 18) * 2.0;                      // S wave
+      if (p > 22 && p <= 26) return Math.sin((p - 22) / 4 * Math.PI) * 4.0;     // T wave
+      return 0;
+    }
+
+    // Animation Loop
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+
+      const ecgAttr = ecgGeometry.attributes.position;
+      const speed = elapsed * 30;
+      const totalWidth = 120;
+
+      let leadX = 0, leadY = 0, leadZ = 0;
+      const tracerIndex = Math.floor(ecgSegments * 0.8);
+
+      for (let i = 0; i < ecgSegments; i++) {
+        const x = (i / ecgSegments) * totalWidth - totalWidth / 2;
+        const phase = x + speed;
+        const y = getEcgY(phase);
+        
+        // 3D Depth Wave Curve along Z-axis
+        const z = Math.sin(x * 0.06 + elapsed * 1.5) * 6;
+
+        ecgAttr.array[i * 3] = x;
+        ecgAttr.array[i * 3 + 1] = y;
+        ecgAttr.array[i * 3 + 2] = z;
+
+        if (i === tracerIndex) {
+          leadX = x;
+          leadY = y;
+          leadZ = z + 10;
+        }
+      }
+      ecgAttr.needsUpdate = true;
+
+      // Update Tracer Position
+      tracerDot.position.set(leadX, leadY, leadZ);
+
+      // Subtle 3D camera angle movement for dynamic depth
+      ecgLine.rotation.y = Math.sin(elapsed * 0.4) * 0.15;
+      ecgLine.rotation.x = Math.cos(elapsed * 0.3) * 0.08;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Window Resize Handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
