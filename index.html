@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediFind</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Fullscreen Splash Overlay */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #030d28; /* Matches dark blue theme */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.8s ease-out, visibility 0.8s;
+    }
+
+    #splash-screen img {
+      max-width: 85%;
+      max-height: 80vh;
+      object-fit: contain;
+      animation: subtlePulse 2s infinite alternate;
+    }
+
+    /* Fade-out state */
+    #splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    @keyframes subtlePulse {
+      from { transform: scale(0.98); }
+      to { transform: scale(1.02); }
+    }
+
+    /* Main Home Page Content */
+    #home-page {
+      padding: 2rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <img src="medifind-logo.png" alt="MediFind Logo" />
+  </div>
+
+  <!-- Main Content -->
+  <main id="home-page">
+    <h1>Welcome to MediFind</h1>
+    <p>Healthcare. Discovered.</p>
+  </main>
+
+  <script>
+    window.addEventListener('load', () => {
+      // Displays splash for 2.5 seconds before fading out
+      setTimeout(() => {
+        document.getElementById('splash-screen').classList.add('hidden');
+      }, 2500);
+    });
+  </script>
+</body>
+</html>
