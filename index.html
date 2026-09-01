@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediFind — Find the doctor. Find the medicine.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #FBFAF6;
+    --bg-soft: #F1EEE5;
+    --ink: #1B231F;
+    --ink-soft: #545E56;
+    --line: #DCD8CB;
+    --teal: #0F6E56;
+    --teal-soft: #E1F0EA;
+    --teal-deep: #08453A;
+    --coral: #C1552E;
+    --coral-soft: #FBEAE2;
+    --coral-deep: #7A3319;
+    --paper: #FFFFFF;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    line-height:1.12;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 32px;}
+  section{padding:96px 0;}
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{outline:2px solid var(--teal); outline-offset:3px;}
+
+  /* ---------- Nav ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(251,250,246,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 32px; max-width:1120px; margin:0 auto;
+  }
+  .logo{
+    font-family:'Fraunces', serif; font-size:20px; font-weight:600;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo .dot{width:8px; height:8px; border-radius:50%; background:var(--coral); display:inline-block;}
+  .navlinks{display:flex; gap:32px; font-size:15px; color:var(--ink-soft);}
+  .navlinks a:hover{color:var(--ink);}
+  @media (max-width:720px){ .navlinks{display:none;} }
+
+  /* ---------- Hero ---------- */
+  .hero{padding:88px 0 64px;}
+  .hero-grid{
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:64px; align-items:center;
+  }
+  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr;} }
+  .eyebrow-line{
+    font-size:15px; color:var(--ink-soft); margin-bottom:18px;
+    border-left:2px solid var(--coral); padding-left:12px;
+  }
+  .hero h1{font-size:46px; max-width:11ch;}
+  @media (max-width:520px){ .hero h1{font-size:34px;} }
+  .hero p.lede{
+    font-size:18px; color:var(--ink-soft); margin-top:22px; max-width:46ch;
+  }
+  .cta-row{display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:13px 22px; border-radius:6px; font-size:15px; font-weight:500;
+    border:1px solid transparent; transition:transform 0.15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-teal{background:var(--teal); color:#fff;}
+  .btn-coral{background:var(--paper); color:var(--coral-deep); border-color:var(--coral);}
+
+  /* hero visual: two converging paths */
+  .hero-visual{
+    background:var(--paper); border:1px solid var(--line); border-radius:14px;
+    padding:28px; position:relative;
+  }
+  .path-row{display:flex; align-items:center; gap:14px; padding:14px 0;}
+  .path-row + .path-row{border-top:1px solid var(--line);}
+  .path-dot{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-size:14px; color:#fff;
+  }
+  .path-dot.t{background:var(--teal);}
+  .path-dot.c{background:var(--coral);}
+  .path-text .k{font-size:14.5px; font-weight:500;}
+  .path-text .d{font-size:13px; color:var(--ink-soft);}
+
+  /* ---------- Why section ---------- */
+  .why{background:var(--bg-soft);}
+  .why-head{max-width:56ch;}
+  .why-head h2{font-size:32px;}
+  .why-head p{color:var(--ink-soft); margin-top:14px; font-size:16px;}
+  .why-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+    background:var(--line); margin-top:48px; border:1px solid var(--line);
+  }
+  @media (max-width:760px){ .why-grid{grid-template-columns:1fr;} }
+  .why-card{background:var(--paper); padding:32px;}
+  .why-card .num{font-family:'Fraunces', serif; font-size:26px; color:var(--teal);}
+  .why-card h3{font-size:18px; margin-top:10px; font-weight:500;}
+  .why-card p{color:var(--ink-soft); font-size:14.5px; margin-top:8px;}
+
+  /* ---------- Journey (two-track timeline) ---------- */
+  .journey-head{max-width:60ch; margin-bottom:56px;}
+  .journey-head h2{font-size:32px;}
+  .journey-head p{color:var(--ink-soft); margin-top:14px; font-size:16px;}
+  .tracks{display:grid; grid-template-columns:1fr 1fr; gap:48px;}
+  @media (max-width:760px){ .tracks{grid-template-columns:1fr;} }
+  .track-label{
+    display:flex; align-items:center; gap:10px; margin-bottom:24px;
+  }
+  .track-label .sw{width:10px; height:10px; border-radius:50%;}
+  .track-label.t .sw{background:var(--teal);}
+  .track-label.c .sw{background:var(--coral);}
+  .track-label span{font-size:14px; letter-spacing:0.02em; color:var(--ink-soft);}
+  .step{
+    position:relative; padding-left:26px; padding-bottom:30px;
+    border-left:1px solid var(--line);
+  }
+  .step:last-child{border-left:1px solid transparent; padding-bottom:0;}
+  .step::before{
+    content:''; position:absolute; left:-5px; top:2px;
+    width:9px; height:9px; border-radius:50%;
+  }
+  .track.t .step::before{background:var(--teal);}
+  .track.c .step::before{background:var(--coral);}
+  .step h3{font-size:16px; font-weight:500; font-family:'IBM Plex Sans', sans-serif;}
+  .step p{font-size:14px; color:var(--ink-soft); margin-top:4px;}
+
+  /* ---------- Features ---------- */
+  .features{background:var(--bg-soft);}
+  .feat-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:48px;
+  }
+  @media (max-width:860px){ .feat-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .feat-grid{grid-template-columns:1fr;} }
+  .feat-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:26px;
+  }
+  .feat-card .mark{
+    width:36px; height:36px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-size:16px; color:#fff; background:var(--ink);
+    margin-bottom:16px;
+  }
+  .feat-card h3{font-size:16.5px; font-weight:500; font-family:'IBM Plex Sans', sans-serif;}
+  .feat-card p{font-size:14px; color:var(--ink-soft); margin-top:8px;}
+
+  /* ---------- CTA band ---------- */
+  .band{
+    background:var(--teal-deep); color:#fff; padding:72px 0; text-align:left;
+  }
+  .band-inner{
+    display:flex; justify-content:space-between; align-items:center; gap:32px; flex-wrap:wrap;
+  }
+  .band h2{font-size:30px; color:#fff; max-width:16ch;}
+  .band p{color:#CFE6DC; margin-top:10px; max-width:40ch; font-size:15.5px;}
+  .band .btn-teal{background:#fff; color:var(--teal-deep);}
+
+  /* ---------- Footer ---------- */
+  footer{padding:48px 0; border-top:1px solid var(--line);}
+  .foot-grid{
+    display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px;
+  }
+  .foot-grid .logo{margin-bottom:8px;}
+  footer p{color:var(--ink-soft); font-size:13.5px; max-width:36ch;}
+  .foot-meta{font-size:13px; color:var(--ink-soft); text-align:right;}
+  @media (max-width:600px){ .foot-meta{text-align:left;} }
+
+  /* ---------- Splash intro ---------- */
+  body.locked{overflow:hidden; height:100vh;}
+  #splash{
+    position:fixed; inset:0; z-index:999;
+    background:var(--teal-deep);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    transition:opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #splash.fade-out{opacity:0; visibility:hidden;}
+  #splash .splash-mark{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Fraunces', serif; font-size:38px; font-weight:600; color:#fff;
+    opacity:0; transform:translateY(10px) scale(0.97);
+    animation:splashIn 0.7s ease forwards;
+  }
+  #splash .splash-mark .dot{
+    width:11px; height:11px; border-radius:50%; background:var(--coral);
+    animation:dotPulse 1.4s ease-in-out infinite;
+  }
+  #splash .splash-tag{
+    margin-top:14px; font-size:13.5px; letter-spacing:0.04em; color:#CFE6DC;
+    opacity:0; animation:splashIn 0.7s ease 0.25s forwards;
+  }
+  @keyframes splashIn{
+    to{opacity:1; transform:translateY(0) scale(1);}
+  }
+  @keyframes dotPulse{
+    0%,100%{transform:scale(1); opacity:1;}
+    50%{transform:scale(1.4); opacity:0.6;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    #splash .splash-mark, #splash .splash-tag{animation:none; opacity:1; transform:none;}
+    #splash .splash-mark .dot{animation:none;}
+  }
+</style>
+</head>
+<body class="locked">
+
+<div id="splash" role="img" aria-label="MediFind loading">
+  <div class="splash-mark"><span class="dot"></span>MediFind</div>
+  <div class="splash-tag">Find the doctor. Find the medicine.</div>
+</div>
+
+<header>
+  <div class="nav">
+    <div class="logo"><span class="dot"></span>MediFind</div>
+    <nav class="navlinks">
+      <a href="#why">Why MediFind</a>
+      <a href="#journey">How it works</a>
+      <a href="#features">Features</a>
+    </nav>
+    <a href="#get-started" class="btn btn-teal" style="padding:9px 18px; font-size:14px;">Get started</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow-line">Built for HackNova'26 · SDG 3, good health &amp; well-being</div>
+        <h1>Care shouldn't stall on a search.</h1>
+        <p class="lede">MediFind matches patients to the right specialist nearby, then reads their prescription and checks live stock and price across pharmacies in the district — so nobody drives to three shops before finding one tablet strip.</p>
+        <div class="cta-row">
+          <a href="#journey" class="btn btn-teal">Find a specialist</a>
+          <a href="#journey" class="btn btn-coral">Upload a prescription</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="path-row">
+          <div class="path-dot t">1</div>
+          <div class="path-text"><div class="k">Doctor matched to your district</div><div class="d">Rating, distance, fee, next slot</div></div>
+        </div>
+        <div class="path-row">
+          <div class="path-dot t">2</div>
+          <div class="path-text"><div class="k">Prescription read automatically</div><div class="d">OCR extracts every medicine line</div></div>
+        </div>
+        <div class="path-row">
+          <div class="path-dot c">3</div>
+          <div class="path-text"><div class="k">Pharmacies compared live</div><div class="d">Stock, quantity, and price side by side</div></div>
+        </div>
+        <div class="path-row">
+          <div class="path-dot c">4</div>
+          <div class="path-text"><div class="k">Reserved, delivered or ready for pickup</div><div class="d">Your data stays encrypted end to end</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="why" id="why">
+    <div class="wrap">
+      <div class="why-head">
+        <h2>The gap isn't doctors or medicine. It's finding them in time.</h2>
+        <p>In smaller towns and districts, patients often don't know which clinic has a specialist free this week, or which pharmacy actually has their prescription in stock. MediFind closes that gap with one search.</p>
+      </div>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="num">01</div>
+          <h3>Specialists are scattered</h3>
+          <p>Patients travel to two or three clinics before finding a doctor who treats their condition and has an open slot.</p>
+        </div>
+        <div class="why-card">
+          <div class="num">02</div>
+          <h3>Handwriting gets lost</h3>
+          <p>A prescription photo sitting in a gallery isn't a plan. It needs to become an exact, searchable medicine list.</p>
+        </div>
+        <div class="why-card">
+          <div class="num">03</div>
+          <h3>Stock is invisible</h3>
+          <p>The nearest pharmacy isn't always the one with the medicine in stock, or the fairest price for it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="journey">
+    <div class="wrap">
+      <div class="journey-head">
+        <h2>Two tracks, one journey</h2>
+        <p>Every patient moves through both sides of MediFind — finding who to see, then finding where to get what was prescribed.</p>
+      </div>
+      <div class="tracks">
+        <div class="track t">
+          <div class="track-label t"><span class="sw"></span><span>FINDING THE DOCTOR</span></div>
+          <div class="step">
+            <h3>Share your location or district</h3>
+            <p>MediFind narrows the search to specialists actually reachable from where you are.</p>
+          </div>
+          <div class="step">
+            <h3>AI specialist finder runs</h3>
+            <p>Matches your symptoms or need to the right specialty, not just the nearest clinic.</p>
+          </div>
+          <div class="step">
+            <h3>Compare doctor and clinic</h3>
+            <p>Rating, distance, consultation fee and the next open slot, all in one card.</p>
+          </div>
+        </div>
+        <div class="track c">
+          <div class="track-label c"><span class="sw"></span><span>FINDING THE MEDICINE</span></div>
+          <div class="step">
+            <h3>Upload the prescription</h3>
+            <p>A photo is enough. OCR extracts each medicine, dose and quantity.</p>
+          </div>
+          <div class="step">
+            <h3>Pharmacies searched and compared</h3>
+            <p>Live stock, quantity and price checked across nearby pharmacies at once.</p>
+          </div>
+          <div class="step">
+            <h3>Reserve, then deliver or pick up</h3>
+            <p>The best-matched pharmacy holds your order. Your details stay encrypted throughout.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="why-head">
+        <h2>What makes it work</h2>
+        <p>Five parts doing one job each, so the handoff from doctor to medicine cabinet never drops.</p>
+      </div>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="mark">AI</div>
+          <h3>Specialist matching</h3>
+          <p>Recommends the right kind of doctor for the condition, ranked by distance and availability.</p>
+        </div>
+        <div class="feat-card">
+          <div class="mark">OCR</div>
+          <h3>Prescription reader</h3>
+          <p>Turns a photographed prescription into an exact, structured medicine list.</p>
+        </div>
+        <div class="feat-card">
+          <div class="mark">₹</div>
+          <h3>Price comparison</h3>
+          <p>Shows what the same medicine costs across every pharmacy that has it in stock.</p>
+        </div>
+        <div class="feat-card">
+          <div class="mark">✓</div>
+          <h3>Instant reservation</h3>
+          <p>Holds your order at the best-matched pharmacy the moment you confirm it.</p>
+        </div>
+        <div class="feat-card">
+          <div class="mark">→</div>
+          <h3>Delivery or pickup</h3>
+          <p>Choose whichever gets the medicine to you fastest, tracked from confirmation to hand-off.</p>
+        </div>
+        <div class="feat-card">
+          <div class="mark">🔒</div>
+          <h3>Secure by default</h3>
+          <p>Prescription images and personal data are encrypted end to end, always.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="get-started">
+    <div class="wrap band-inner">
+      <div>
+        <h2>Built for the districts that need it most</h2>
+        <p>A prototype for HackNova'26, aligned with SDG 3 — good health and well-being for every district, not just the ones with the most pharmacies.</p>
+      </div>
+      <a href="#why" class="btn btn-teal">See how it works</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="logo"><span class="dot"></span>MediFind</div>
+      <p>A doctor-to-pharmacy healthcare access concept built for HackNova'26, IEEE Computer Society Student Branch Chapter, KIOT Salem.</p>
+    </div>
+    <div class="foot-meta">
+      Hackathon prototype · Not a live medical service<br>
+      Sustainable Development Goals · Good health &amp; well-being
+    </div>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      var splash = document.getElementById('splash');
+      splash.classList.add('fade-out');
+      document.body.classList.remove('locked');
+      setTimeout(function(){ splash.remove(); }, 650);
+    }, 3000);
+  });
+</script>
+</body>
+</html>
