@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>MEDIFIND</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=DM+Serif+Display:ital@0;1&display=swap"
+      rel="stylesheet">
+
+
+<style>
+
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    overflow: hidden;
+    background: #010609;
+    font-family: Arial, sans-serif;
+}
+
+
+/* =====================================================
+   MAIN SCREEN
+===================================================== */
+
+.app {
+    position: relative;
+
+    width: 100%;
+    height: 100dvh;
+
+    min-height: 600px;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 48%,
+            rgba(0,255,120,.18) 0%,
+            rgba(0,100,60,.07) 25%,
+            transparent 55%
+        ),
+
+        linear-gradient(
+            180deg,
+            #010508 0%,
+            #02100e 55%,
+            #010609 100%
+        );
+}
+
+
+/* =====================================================
+   BACKGROUND GRID
+===================================================== */
+
+.grid-wall {
+
+    position: absolute;
+
+    width: 180%;
+    height: 80%;
+
+    left: -40%;
+    top: 8%;
+
+    background-image:
+
+        linear-gradient(
+            rgba(0,255,130,.065) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(0,255,130,.065) 1px,
+            transparent 1px
+        );
+
+    background-size: 45px 45px;
+
+    transform:
+        perspective(700px)
+        rotateX(48deg);
+
+    transform-origin: center center;
+
+    opacity: .75;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            transparent 0%,
+            black 20%,
+            black 75%,
+            transparent 100%
+        );
+}
+
+
+/* =====================================================
+   3D FLOOR
+===================================================== */
+
+.floor {
+
+    position: absolute;
+
+    width: 180%;
+    height: 48%;
+
+    left: -40%;
+    bottom: -12%;
+
+    background-image:
+
+        linear-gradient(
+            rgba(0,255,130,.13) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(0,255,130,.13) 1px,
+            transparent 1px
+        );
+
+    background-size: 45px 45px;
+
+    transform:
+        perspective(450px)
+        rotateX(62deg);
+
+    transform-origin: center top;
+
+    box-shadow:
+        inset 0 30px 60px
+        rgba(0,255,130,.08);
+
+    opacity: .8;
+}
+
+
+/* =====================================================
+   LARGE CIRCLE
+===================================================== */
+
+.circle {
+
+    position: absolute;
+
+    width: min(920px, 125vw);
+    height: min(920px, 125vw);
+
+    left: 50%;
+    top: 48%;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    border:
+        2px solid
+        rgba(0,255,100,.22);
+
+    box-shadow:
+
+        0 0 30px
+        rgba(0,255,100,.05),
+
+        inset 0 0 50px
+        rgba(0,255,100,.04);
+}
+
+
+/* inner circle */
+
+.circle::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 65px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(0,255,100,.08);
+}
+
+
+/* =====================================================
+   ECG AREA
+===================================================== */
+
+.ecg-wrapper {
+
+    position: absolute;
+
+    width: 100%;
+    height: 220px;
+
+    left: 0;
+
+    top: 42%;
+
+    z-index: 4;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    filter:
+        drop-shadow(0 0 5px #00ff88)
+        drop-shadow(0 0 14px rgba(0,255,120,.8));
+}
+
+
+/* ECG SVG */
+
+.ecg {
+
+    position: absolute;
+
+    width: 200%;
+    height: 100%;
+
+    left: 0;
+
+    top: 0;
+}
+
+
+/* ECG background line */
+
+.ecg-base {
+
+    fill: none;
+
+    stroke:
+        rgba(0,255,120,.12);
+
+    stroke-width: 2;
+}
+
+
+/* Actual moving ECG */
+
+.ecg-live {
+
+    fill: none;
+
+    stroke: #00ff8a;
+
+    stroke-width: 4;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+
+    stroke-dasharray: 120 1800;
+
+    stroke-dashoffset: 0;
+
+    animation:
+        ecgMove 2.7s linear infinite;
+}
+
+
+/* moving ECG animation */
+
+@keyframes ecgMove {
+
+    from {
+        stroke-dashoffset: 1920;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+
+/* =====================================================
+   MAIN CONTENT
+===================================================== */
+
+.content {
+
+    position: absolute;
+
+    z-index: 10;
+
+    width: 100%;
+
+    height: 100%;
+
+    left: 0;
+    top: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding-top: 1%;
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.logo {
+
+    position: relative;
+
+    width: 150px;
+    height: 150px;
+
+    margin-bottom: 42px;
+
+    transform:
+        perspective(700px)
+        rotateX(4deg);
+
+    filter:
+        drop-shadow(0 0 8px #00ff88)
+        drop-shadow(0 0 25px rgba(0,255,130,.65));
+
+    z-index: 15;
+}
+
+
+/* =====================================================
+   MEDICAL CROSS
+===================================================== */
+
+.cross {
+
+    position: absolute;
+
+    width: 92px;
+    height: 92px;
+
+    left: 29px;
+    top: 23px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #00ff9d,
+            #00dc72
+        );
+
+    clip-path: polygon(
+
+        32% 0%,
+        68% 0%,
+
+        68% 32%,
+        100% 32%,
+
+        100% 68%,
+        68% 68%,
+
+        68% 100%,
+        32% 100%,
+
+        32% 68%,
+        0% 68%,
+
+        0% 32%,
+        32% 32%
+    );
+
+    box-shadow:
+        0 15px 20px
+        rgba(0,0,0,.35);
+}
+
+
+/* =====================================================
+   MAGNIFYING GLASS
+===================================================== */
+
+.magnifier {
+
+    position: absolute;
+
+    width: 72px;
+    height: 72px;
+
+    left: 39px;
+    top: 34px;
+
+    border-radius: 50%;
+
+    border:
+        6px solid #00130c;
+
+    background:
+        rgba(0,30,18,.25);
+
+    z-index: 20;
+
+    box-shadow:
+
+        inset 0 0 12px
+        rgba(0,255,130,.3),
+
+        0 0 5px
+        #001b10;
+}
+
+
+/* =====================================================
+   MAGNIFIER HANDLE
+===================================================== */
+
+.magnifier::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 48px;
+    height: 18px;
+
+    right: -38px;
+    bottom: -22px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00ff91,
+            #00db72
+        );
+
+    transform:
+        rotate(46deg);
+
+    box-shadow:
+        0 7px 10px
+        rgba(0,0,0,.35);
+}
+
+
+/* =====================================================
+   STAR / MEDICAL SEARCH SYMBOL
+===================================================== */
+
+.star {
+
+    position: absolute;
+
+    width: 31px;
+    height: 31px;
+
+    left: 15px;
+    top: 14px;
+
+    background: #00ff91;
+
+    clip-path: polygon(
+
+        50% 0%,
+        61% 38%,
+        100% 50%,
+        61% 62%,
+        50% 100%,
+        39% 62%,
+        0% 50%,
+        39% 38%
+    );
+
+    filter:
+        drop-shadow(0 0 5px #00ff91);
+}
+
+
+/* =====================================================
+   LOGO 3D SHADOW
+===================================================== */
+
+.logo::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 85px;
+    height: 22px;
+
+    left: 35px;
+    bottom: 15px;
+
+    background:
+        rgba(0,0,0,.5);
+
+    filter: blur(12px);
+
+    border-radius: 50%;
+
+    z-index: -1;
+}
+
+
+/* =====================================================
+   MEDIFIND
+===================================================== */
+
+.title {
+
+    font-family: "Caveat", cursive;
+
+    font-size:
+        clamp(60px, 15vw, 92px);
+
+    font-weight: 700;
+
+    font-style: italic;
+
+    letter-spacing: 3px;
+
+    color: #00f582;
+
+    line-height: 1;
+
+    white-space: nowrap;
+
+    text-align: center;
+
+    margin-bottom: 85px;
+
+    text-shadow:
+
+        0 3px 0 #008f4b,
+
+        0 6px 0 #006c3b,
+
+        0 0 6px #00ff88,
+
+        0 0 15px #00ff88,
+
+        0 0 35px rgba(0,255,120,.7);
+
+    filter:
+        contrast(1.25);
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.enter-btn {
+
+    position: relative;
+
+    width: min(480px, 78vw);
+
+    height: 115px;
+
+    border: none;
+
+    border-radius: 65px;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            #09fa89,
+            #00df73
+        );
+
+    color: #03130d;
+
+    font-family:
+        "DM Serif Display",
+        serif;
+
+    font-size:
+        clamp(24px, 6vw, 34px);
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow:
+
+        0 0 8px #00ff88,
+
+        0 0 22px rgba(0,255,130,.9),
+
+        0 0 50px rgba(0,255,130,.45),
+
+        0 12px 25px
+        rgba(0,0,0,.55);
+
+    transition:
+        .25s ease;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   BUTTON 3D EDGE
+===================================================== */
+
+.enter-btn::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 4px;
+    right: 4px;
+
+    bottom: -9px;
+
+    height: 18px;
+
+    border-radius: 50%;
+
+    background:
+        #008e4c;
+
+    z-index: -1;
+}
+
+
+/* =====================================================
+   BUTTON
