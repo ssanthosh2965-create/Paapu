@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEDIFIND</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+body{
+    background:#02090d;
+    font-family:Arial,sans-serif;
+}
+
+/* MAIN */
+.app{
+    position:relative;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+
+    background:
+        radial-gradient(circle at center,
+        rgba(0,255,120,.16),
+        transparent 42%),
+        #02090d;
+}
+
+/* BACKGROUND GRID */
+.grid{
+    position:absolute;
+    width:200%;
+    height:100%;
+    left:-50%;
+    top:0;
+
+    background-image:
+        linear-gradient(rgba(0,255,120,.055) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,255,120,.055) 1px,transparent 1px);
+
+    background-size:42px 42px;
+
+    transform:
+        perspective(600px)
+        rotateX(55deg);
+
+    transform-origin:center bottom;
+}
+
+/* 3D FLOOR */
+.floor{
+    position:absolute;
+    width:200%;
+    height:45%;
+    left:-50%;
+    bottom:-5%;
+
+    background-image:
+        linear-gradient(rgba(0,255,120,.13) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,255,120,.13) 1px,transparent 1px);
+
+    background-size:42px 42px;
+
+    transform:
+        perspective(450px)
+        rotateX(60deg);
+
+    transform-origin:center top;
+}
+
+/* BIG CIRCLE */
+.circle{
+    position:absolute;
+
+    width:780px;
+    height:780px;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    border:2px solid rgba(0,255,100,.20);
+    border-radius:50%;
+
+    box-shadow:
+        0 0 40px rgba(0,255,100,.04),
+        inset 0 0 40px rgba(0,255,100,.04);
+}
+
+/* ECG */
+.ecg{
+    position:absolute;
+
+    width:100%;
+    height:200px;
+
+    top:40%;
+    left:0;
+
+    z-index:3;
+
+    overflow:hidden;
+}
+
+/* ECG SVG */
+.ecg svg{
+    width:200%;
+    height:100%;
+
+    animation:moveECG 3s linear infinite;
+}
+
+/* ECG line */
+.ecg path{
+    fill:none;
+
+    stroke:#00ff88;
+
+    stroke-width:4;
+
+    stroke-linecap:round;
+    stroke-linejoin:round;
+
+    filter:
+        drop-shadow(0 0 4px #00ff88)
+        drop-shadow(0 0 12px #00ff88);
+}
+
+/* ACTUAL MOVEMENT */
+@keyframes moveECG{
+
+    from{
+        transform:translateX(0);
+    }
+
+    to{
+        transform:translateX(-50%);
+    }
+}
+
+/* CENTER CONTENT */
+.content{
+    position:absolute;
+
+    inset:0;
+
+    z-index:10;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding-top:10px;
+}
+
+/* LOGO */
+.logo{
+    position:relative;
+
+    width:150px;
+    height:150px;
+
+    margin-bottom:35px;
+
+    filter:
+        drop-shadow(0 0 7px #00ff88)
+        drop-shadow(0 0 20px rgba(0,255,120,.7));
+}
+
+/* MEDICAL CROSS */
+.cross{
+    position:absolute;
+
+    width:95px;
+    height:95px;
+
+    left:27px;
+    top:20px;
+
+    background:#00ed7d;
+
+    clip-path:polygon(
+        32% 0,
+        68% 0,
+        68% 32%,
+        100% 32%,
+        100% 68%,
+        68% 68%,
+        68% 100%,
+        32% 100%,
+        32% 68%,
+        0 68%,
+        0 32%,
+        32% 32%
+    );
+}
+
+/* MAGNIFYING GLASS */
+.magnifier{
+    position:absolute;
+
+    width:72px;
+    height:72px;
+
+    left:39px;
+    top:31px;
+
+    border:6px solid #00140d;
+
+    border-radius:50%;
+
+    background:rgba(0,30,18,.35);
+
+    z-index:5;
+}
+
+/* HANDLE */
+.magnifier:after{
+    content:"";
+
+    position:absolute;
+
+    width:48px;
+    height:18px;
+
+    right:-38px;
+    bottom:-22px;
+
+    background:#00ed7d;
+
+    border-radius:12px;
+
+    transform:rotate(46deg);
+}
+
+/* STAR */
+.star{
+    position:absolute;
+
+    width:31px;
+    height:31px;
+
+    left:15px;
+    top:14px;
+
+    background:#00ff91;
+
+    clip-path:polygon(
+        50% 0,
+        61% 38%,
+        100% 50%,
+        61% 62%,
+        50% 100%,
+        39% 62%,
+        0 50%,
+        39% 38%
+    );
+}
+
+/* TITLE */
+.title{
+    color:#00f582;
+
+    font-family:
+        "Trebuchet MS",
+        Arial,
+        sans-serif;
+
+    font-size:clamp(55px,14vw,90px);
+
+    font-weight:900;
+
+    font-style:italic;
+
+    letter-spacing:3px;
+
+    margin-bottom:75px;
+
+    text-shadow:
+        0 3px 0 #008c4a,
+        0 6px 0 #005d32,
+        0 0 8px #00ff88,
+        0 0 20px #00ff88,
+        0 0 40px rgba(0,255,120,.6);
+}
+
+/* BUTTON */
+.enter{
+    width:min(480px,80vw);
+
+    height:105px;
+
+    border:none;
+
+    border-radius:60px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #0aff91,
+            #00dc72
+        );
+
+    color:#03120c;
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 0 8px #00ff88,
+        0 0 25px #00ff88,
+        0 0 55px rgba(0,255,120,.45);
+
+    transition:.25s;
+}
+
+.enter:hover{
+    transform:scale(1.04);
+
+    box-shadow:
+        0 0 15px #00ff88,
+        0 0 40px #00ff88,
+        0 0 80px rgba(0,255,120,.6);
+}
+
+.enter:active{
+    transform:scale(.96);
+}
+
+/* MOBILE */
+@media(max-width:600px){
+
+    .circle{
+        width:760px;
+        height:760px;
+    }
+
+    .logo{
+        transform:scale(.85);
+        margin-bottom:20px;
+    }
+
+    .title{
+        font-size:60px;
+        margin-bottom:65px;
+    }
+
+    .enter{
+        height:90px;
+        font-size:25px;
+    }
+
+    .ecg{
+        top:40%;
+        height:170px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- BACKGROUND -->
+    <div class="grid"></div>
+    <div class="floor"></div>
+    <div class="circle"></div>
+
+    <!-- WORKING ECG -->
+    <div class="ecg">
+
+        <svg viewBox="0 0 2400 200"
+             preserveAspectRatio="none">
+
+            <path d="
+            M0 100
+            L100 100
+            L130 100
+            L145 92
+            L160 100
+            L185 100
+
+            L200 100
+            L215 55
+            L230 165
+            L245 25
+            L260 100
+
+            L300 100
+            L390 100
+
+            L405 100
+            L420 92
+            L435 100
+
+            L460 100
+            L475 55
+            L490 165
+            L505 25
+            L520 100
+
+            L560 100
+            L650 100
+
+            L665 100
+            L680 92
+            L695 100
+
+            L720 100
+            L735 55
+            L750 165
+            L765 25
+            L780 100
+
+            L820 100
+            L910 100
+
+            L925 100
+            L940 92
+            L955 100
+
+            L980 100
+            L995 55
+            L1010 165
+            L1025 25
+            L1040 100
+
+            L1080 100
+            L1170 100
+
+            L1185 100
+            L1200 92
+            L1215 100
+
+            L1240 100
+            L1255 55
+            L1270 165
+            L1285 25
+            L1300 100
+
+            L1340 100
+            L1430 100
+
+            L1445 100
+            L1460 92
+            L1475 100
+
+            L1500 100
+            L1515 55
+            L1530 165
+            L1545 25
+            L1560 100
+
+            L1600 100
+            L1690 100
+
+            L1705 100
+            L1720 92
+            L1735 100
+
+            L1760 100
+            L1775 55
+            L1790 165
+            L1805 25
+            L1820 100
+
+            L1860 100
+            L1950 100
+
+            L1965 100
+            L1980 92
+            L1995 100
+
+            L2020 100
+            L2035 55
+            L2050 165
+            L2065 25
+            L2080 100
+
+            L2120 100
+            L2250 100
+            L2400 100
+            " />
+
+        </svg>
+
+    </div>
+
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- LOGO -->
+        <div class="logo">
+
+            <div class="cross"></div>
+
+            <div class="magnifier">
+                <div class="star"></div>
+            </div>
+
+        </div>
+
+
+        <!-- NAME -->
+        <div class="title">
+            MEDIFIND
+        </div>
+
+
+        <!-- BUTTON -->
+        <button
+            class="enter"
+            onclick="enterPlatform()">
+
+            Enter Platform
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function enterPlatform(){
+
+    /* Change this to your next page */
+
+    window.location.href = "dashboard.html";
+
+}
+
+</script>
+
+</body>
+</html>
