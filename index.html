@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>MEDIFIND</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 50% 50%,
+                rgba(0, 255, 140, 0.13),
+                transparent 35%),
+            linear-gradient(145deg, #02090d, #001b18, #02090d);
+
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #00ff88;
+    }
+
+    /* ---------------- BACKGROUND ---------------- */
+
+    .background {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        perspective: 900px;
+    }
+
+    /* 3D grid */
+    .grid {
+        position: absolute;
+        width: 180%;
+        height: 100%;
+        left: -40%;
+        top: 20%;
+
+        background-image:
+            linear-gradient(rgba(0,255,140,.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,140,.08) 1px, transparent 1px);
+
+        background-size: 45px 45px;
+
+        transform:
+            rotateX(62deg)
+            translateZ(-100px)
+            scale(1.4);
+
+        opacity: .65;
+    }
+
+    /* Large 3D circle */
+    .circle {
+        position: absolute;
+        width: 780px;
+        height: 780px;
+        left: 50%;
+        top: 52%;
+        transform: translate(-50%, -50%);
+
+        border: 1px solid rgba(0,255,140,.12);
+        border-radius: 50%;
+
+        box-shadow:
+            0 0 80px rgba(0,255,140,.04),
+            inset 0 0 80px rgba(0,255,140,.04);
+    }
+
+    /* ---------------- ECG ---------------- */
+
+    .ecg {
+        position: absolute;
+        width: 160%;
+        height: 300px;
+        left: -30%;
+        top: 47%;
+
+        transform:
+            rotateX(55deg)
+            rotateZ(-2deg);
+
+        opacity: .28;
+        filter: drop-shadow(0 0 8px #00ff88);
+    }
+
+    .ecg path {
+        fill: none;
+        stroke: #00ff88;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+
+        animation: heartbeat 5s linear infinite;
+    }
+
+    @keyframes heartbeat {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    /* ---------------- MAIN CONTENT ---------------- */
+
+    .container {
+        position: relative;
+        z-index: 10;
+
+        width: 100%;
+        max-width: 430px;
+        height: 100vh;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        padding: 25px;
+    }
+
+    /* Logo */
+
+    .logo {
+        position: relative;
+        width: 125px;
+        height: 125px;
+
+        margin-bottom: 55px;
+
+        filter:
+            drop-shadow(0 0 15px rgba(0,255,140,.8))
+            drop-shadow(0 0 35px rgba(0,255,140,.35));
+    }
+
+    .medical-cross {
+        position: absolute;
+
+        width: 78px;
+        height: 78px;
+
+        left: 22px;
+        top: 22px;
+
+        background: #00e879;
+
+        clip-path: polygon(
+            32% 0%,
+            68% 0%,
+            68% 32%,
+            100% 32%,
+            100% 68%,
+            68% 68%,
+            68% 100%,
+            32% 100%,
+            32% 68%,
+            0% 68%,
+            0% 32%,
+            32% 32%
+        );
+    }
+
+    /* Magnifying glass */
+
+    .glass {
+        position: absolute;
+
+        width: 58px;
+        height: 58px;
+
+        left: 28px;
+        top: 28px;
+
+        border: 5px solid #03130f;
+        border-radius: 50%;
+
+        background: rgba(0,255,140,.08);
+
+        box-shadow:
+            inset 0 0 15px rgba(0,255,140,.5);
+    }
+
+    .glass::after {
+        content: "";
+
+        position: absolute;
+
+        width: 38px;
+        height: 13px;
+
+        background: #00e879;
+
+        right: -29px;
+        bottom: -16px;
+
+        transform: rotate(45deg);
+
+        border-radius: 8px;
+    }
+
+    /* Center medical symbol */
+
+    .star {
+        position: absolute;
+
+        left: 18px;
+        top: 17px;
+
+        width: 22px;
+        height: 22px;
+
+        background: #00e879;
+
+        clip-path: polygon(
+            50% 0%,
+            61% 36%,
+            100% 50%,
+            61% 64%,
+            50% 100%,
+            39% 64%,
+            0% 50%,
+            39% 36%
+        );
+    }
+
+    /* ---------------- TITLE ---------------- */
+
+    .title {
+        font-family: "Trebuchet MS", Arial, sans-serif;
+
+        font-size: clamp(45px, 12vw, 72px);
+
+        font-weight: 900;
+        font-style: italic;
+
+        letter-spacing: 3px;
+
+        color: #00f57d;
+
+        text-align: center;
+
+        margin-bottom: 85px;
+
+        text-shadow:
+            0 0 5px #00ff88,
+            0 0 15px rgba(0,255,140,.8),
+            0 0 35px rgba(0,255,140,.35);
+
+        filter: contrast(1.25);
+    }
+
+    /* ---------------- BUTTON ---------------- */
+
+    .button {
+        width: min(370px, 90vw);
+        height: 100px;
+
+        border: none;
+        border-radius: 55px;
+
+        background: #00e879;
+
+        color: #03130d;
+
+        font-family: "Trebuchet MS", Arial, sans-serif;
+
+        font-size: 27px;
+        font-weight: 900;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 0 12px rgba(0,255,140,.8),
+            0 0 35px rgba(0,255,140,.45),
+            0 12px 35px rgba(0,0,0,.45);
+
+        transition: .25s ease;
+
+        position: relative;
+        overflow: hidden;
+    }
+
+    .button:hover {
+        transform: scale(1.04);
+
+        box-shadow:
+            0 0 20px #00ff88,
+            0 0 50px rgba(0,255,140,.7);
+    }
+
+    .button:active {
+        transform: scale(.97);
+    }
+
+    /* Button shine */
+
+    .button::before {
+        content: "";
+
+        position: absolute;
+
+        width: 80px;
+        height: 180px;
+
+        background: rgba(255,255,255,.25);
+
+        transform: rotate(25deg);
+
+        left: -120px;
+        top: -40px;
+
+        transition: .6s;
+    }
+
+    .button:hover::before {
+        left: 450px;
+    }
+
+    /* ---------------- MOBILE ---------------- */
+
+    @media(max-width: 500px) {
+
+        .container {
+            padding: 18px;
+        }
+
+        .logo {
+            width: 110px;
+            height: 110px;
+            margin-bottom: 45px;
+        }
+
+        .title {
+            font-size: 48px;
+            margin-bottom: 70px;
+        }
+
+        .button {
+            height: 90px;
+            font-size: 24px;
+        }
+
+        .circle {
+            width: 700px;
+            height: 700px;
+        }
+
+        .ecg {
+            width: 220%;
+            left: -60%;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Background -->
+<div class="background">
+
+    <div class="grid"></div>
+
+    <div class="circle"></div>
+
+    <!-- 3D ECG heartbeat -->
+    <svg class="ecg"
+         viewBox="0 0 1200 300"
+         preserveAspectRatio="none">
+
+        <path d="
+        M0 150
+        L120 150
+        L145 150
+        L165 145
+        L180 150
+
+        L205 150
+        L220 150
+
+        L235 100
+        L250 205
+        L265 65
+        L280 150
+
+        L310 150
+        L400 150
+        L430 150
+
+        L455 145
+        L470 150
+
+        L495 150
+        L510 100
+        L525 205
+        L540 65
+        L555 150
+
+        L590 150
+        L700 150
+        L730 150
+
+        L750 145
+        L765 150
+
+        L790 150
+        L805 100
+        L820 205
+        L835 65
+        L850 150
+
+        L900 150
+        L1010 150
+
+        L1030 145
+        L1045 150
+
+        L1070 150
+        L1085 100
+        L1100 205
+        L1115 65
+        L1130 150
+
+        L1200 150
+        "/>
+
+    </svg>
+
+</div>
+
+
+<!-- Main UI -->
+<div class="container">
+
+    <!-- Logo -->
+    <div class="logo">
+
+        <div class="medical-cross"></div>
+
+        <div class="glass">
+            <div class="star"></div>
+        </div>
+
+    </div>
+
+
+    <!-- App Name -->
+    <div class="title">
+        MEDIFIND
+    </div>
+
+
+    <!-- Button -->
+    <button class="button"
+            onclick="enterPlatform()">
+
+        Enter Platform
+
+    </button>
+
+</div>
+
+
+<script>
+
+function enterPlatform() {
+
+    alert("Welcome to MEDIFIND!");
+
+    // You can change this later:
+    // window.location.href = "dashboard.html";
+
+}
+
+</script>
+
+</body>
+</html>
