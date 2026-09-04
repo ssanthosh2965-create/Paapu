@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MEDIFIND</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      background-color: #010810;
+      font-family: 'Inter', sans-serif;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .app-container {
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 45%, #062a3e 0%, #02111a 60%, #000508 100%);
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: background 0.5s ease;
+    }
+
+    /* BRAND CONTAINER */
+    .brand-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      z-index: 2;
+    }
+
+    /* LOGO BUTTON WRAPPER */
+    .logo-wrapper {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .logo-wrapper:active {
+      transform: scale(0.94);
+    }
+
+    /* BACKGROUND GLOW */
+    .logo-glow {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(0, 210, 255, 0.35) 0%, rgba(0, 255, 204, 0.15) 50%, transparent 75%);
+      border-radius: 50%;
+      opacity: 0;
+      animation: glowPulse 0.8s ease-out 1.2s forwards;
+    }
+
+    @keyframes glowPulse {
+      0% { opacity: 0; transform: scale(0.5); }
+      100% { opacity: 1; transform: scale(1.3); }
+    }
+
+    /* 4-PIECE ASSEMBLY ANIMATION FOR SVG */
+    .logo-piece {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      will-change: transform, opacity;
+      animation-duration: 1.2s;
+      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+      animation-fill-mode: forwards;
+    }
+
+    .piece-tl { opacity: 0; animation-name: flyTopLeft; }
+    @keyframes flyTopLeft {
+      0% { opacity: 0; transform: translate(-300px, -300px) rotate(-360deg) scale(0.3); }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    .piece-tr { opacity: 0; animation-name: flyTopRight; }
+    @keyframes flyTopRight {
+      0% { opacity: 0; transform: translate(300px, -300px) rotate(360deg) scale(0.3); }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    .piece-bl { opacity: 0; animation-name: flyBottomLeft; }
+    @keyframes flyBottomLeft {
+      0% { opacity: 0; transform: translate(-300px, 300px) rotate(360deg) scale(0.3); }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    .piece-br { opacity: 0; animation-name: flyBottomRight; }
+    @keyframes flyBottomRight {
+      0% { opacity: 0; transform: translate(300px, 300px) rotate(-360deg) scale(0.3); }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    /* ROTATING DASHED RING */
+    .logo-ring {
+      position: absolute;
+      width: 108%;
+      height: 108%;
+      border-radius: 50%;
+      border: 2px dashed rgba(0, 210, 255, 0.4);
+      opacity: 0;
+      animation: ringFadeIn 0.5s ease-out 1.2s forwards, spinRing 12s linear 1.2s infinite;
+    }
+
+    @keyframes ringFadeIn {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes spinRing {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* INSTRUCTION HINT */
+    .double-tap-hint {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: rgba(0, 255, 204, 0.8);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: textReveal 0.8s ease-out 1.1s forwards;
+      background: rgba(0, 210, 255, 0.08);
+      border: 1px solid rgba(0, 255, 204, 0.2);
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    /* TEXT BRANDING */
+    .text-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      animation: textReveal 0.8s ease-out 1.1s forwards;
+    }
+
+    @keyframes textReveal {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-title {
+      font-size: 3.2rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      line-height: 1;
+      display: flex;
+    }
+
+    .brand-title .medi { color: #00d2ff; }
+    .brand-title .find { color: #00ffcc; }
+
+    .brand-tagline {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 3.5px;
+      color: #ffffff;
+      opacity: 0.85;
+      text-transform: uppercase;
+    }
+
+    /* EMERGENCY TRIGGERED RED ALERT STATE */
+    .app-container.emergency-active {
+      animation: alertPulse 0.8s infinite alternate;
+    }
+
+    @keyframes alertPulse {
+      0% { background: radial-gradient(circle at 50% 45%, #4a0307 0%, #1a0204 60%, #000508 100%); }
+      100% { background: radial-gradient(circle at 50% 45%, #7a080e 0%, #2e0306 60%, #000508 100%); }
+    }
+
+    .emergency-status {
+      position: absolute;
+      bottom: 45px;
+      background: rgba(255, 51, 68, 0.25);
+      border: 1px solid #ff3344;
+      padding: 12px 24px;
+      border-radius: 30px;
+      color: #ff4d5e;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 25px rgba(255, 51, 68, 0.5);
+    }
+
+    .emergency-status.show {
+      display: flex;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container" id="appContainer">
+
+    <div class="brand-section">
+      
+      <div class="logo-wrapper" id="emergencyBtn">
+        <div class="logo-glow"></div>
+        <div class="logo-ring"></div>
+
+        <svg class="logo-piece piece-tl" viewBox="0 0 200 200">
+          <g clip-path="url(#clip-tl)">
+            <path d="M 15,100 H 45 L 52,88 L 60,112 L 68,95 L 75,100 H 85" stroke="#00d2ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 115,100 H 125 L 132,88 L 140,112 L 148,95 L 155,100 H 185" stroke="#00ffcc" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <rect x="70" y="25" width="60" height="150" rx="18" fill="none" stroke="url(#crossGradient)" stroke-width="6"/>
+            <rect x="25" y="70" width="150" height="60" rx="18" fill="none" stroke="url(#crossGradient)" stroke-width="6"/>
+            
+            <path d="M 100,50 C 94,42 84,44 84,52 C 84,60 100,70 100,70 C 100,70 116,60 116,52 C 116,44 106,42 100,50 Z" fill="#00d2ff"/>
+            <path d="M 89,53 H 95 L 97,49 L 100,57 L 103,51 L 105,53 H 111" stroke="#010810" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <text x="50" y="112" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#00d2ff" text-anchor="middle">S</text>
+
+            <circle cx="100" cy="100" r="24" fill="#010810" stroke="#ff3344" stroke-width="4"/>
+            <path d="M 85,100 H 91 L 94,91 L 100,109 L 106,93 L 109,100 H 115" stroke="#ff3344" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <text x="150" y="112" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#00ffcc" text-anchor="middle">S</text>
+
+            <path d="M 88,142 C 88,138 94,136 100,138 C 106,136 112,138 112,142 C 112,148 100,154 100,154 C 100,154 88,148 88,142 Z" fill="#00ffcc" opacity="0.4"/>
+            <path d="M 86,148 C 90,144 95,145 100,148 C 105,145 110,144 114,148 C 112,154 100,158 100,158 C 100,158 88,154 86,148 Z" fill="#00ffcc"/>
+            <path d="M 97,135 H 103 V 145 H 97 Z M 94,138 H 106 V 142 H 94 Z" fill="#00ffcc"/>
+          </g>
+          <defs>
+            <linearGradient id="crossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00d2ff"/>
+              <stop offset="100%" stop-color="#00ffcc"/>
+            </linearGradient>
+            <clipPath id="clip-tl"><rect x="0" y="0" width="100" height="100" /></clipPath>
+          </defs>
+        </svg>
+
+        <svg class="logo-piece piece-tr" viewBox="0 0 200 200">
+          <use href="#logoMaster"/>
+          <g clip-path="url(#clip-tr)">
+            <path d="M 15,100 H 45 L 52,88 L 60,112 L 68,95 L 75,100 H 85" stroke="#00d2ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 115,100 H 125 L 132,88 L 140,112 L 148,95 L 155,100 H 185" stroke="#00ffcc" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="70" y="25" width="60" height="150" rx="18" fill="none" stroke="url(#crossGradient)" stroke-width="6"/>
+            <rect x="25" y="70" width="150" height="60" rx="18" fill="none" stroke="url(#crossGradient)" stroke-width="6"/>
+            <path d="M 100,50 C 94,42 84,44 84,52 C 84,60 100,70 100,70 C 100,70 116,60 116,52 C 116,44 106,42 100,50 Z" fill="#00d2ff"/>
+            <path d="M 89,53 H 95 L 97,49 L 100,57 L 103,51 L 105,53 H 111" stroke="#010810" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="50" y="112" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#00d2ff" text-anchor="middle">S</text>
+            <circle cx="100" cy="100" r="24" fill="#010810" stroke="#ff3344" stroke-width="4"/>
+            <path d="M 85,100 H 91 L 94,91 L 100,109 L 106,93 L 109,100 H 115" stroke="#ff3344" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="150" y="112" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#00ffcc" text-anchor="middle">S</text>
+            <path d="M 86,148 C 90,144 95,145 100,148 C 105,145 110,144 114,148 C 112,154 100,158 100,158 C 100,158 88,154 86,148 Z" fill="#00ffcc"/>
+            <path d="M 97,135 H 103 V 145 H 97 Z M 94,138 H 106 V 142 H 94 Z" fill="#00ffcc"/>
+          </g>
+          <defs>
+            <clipPath id="clip-tr"><rect x="100" y="0" width="100" height="100" /></clipPath>
+          </defs>
+        </svg>
+
+        <svg class="logo-piece piece-bl" viewBox="0 0 200 200">
+          <g clip-path="url(#clip-bl)">
+            <path d="M 15,100 H 45 L 52,88 L 60,112 L 68,95 L 75,100 H 85" stroke="#00d2ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 115,100 H 125 L 132,88 L 140,112 L 148,95 L 155,100 H 185" stroke="#00ffcc" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="70" y="25" width="60" height="150" rx="18" fill="none" stroke="url(#crossGradient)" stroke-width="6"/>
+            <rect x="25" y="70" width="150" height="60" rx="18" fill="none" stroke="url(#crossGradient)" stroke-width="6"/>
+            <path d="M 100,50 C 94,42 84,44 84,52 C 84,60 100,70 100,70 C 100,70 116,60 116,52 C 116,44 106,42 100,50 Z" fill="#00d2ff"/>
+            <path d="M 89,53 H 95 L 97,49 L 100,57 L 103,51 L 105,53 H 111" stroke="#010810" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="50" y="112" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#00d2ff" text-anchor="middle">S</text>
+            <circle cx="100" cy="100" r="24" fill="#010810" stroke="#ff3344" stroke-width="4"/>
+            <path d="M 85,100 H 91 L 94,91 L 100,109 L 106,93 L 109,100 H 115" stroke="#ff3344" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="150" y="112" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#00ffcc" text-anchor="middle">S</text>
+            <path d="M 86,148 C 90,144 95,145 100,148 C 105,145 110,144 114,148 C 112,154 100,158 100,158 C 100,158 88,154 86,148 Z" fill="#00ffcc"/>
+            <path d="M 97,135 H 103 V 145 H 97 Z M 94,138 H 106 V 142 H 94 Z" fill="#00ffcc"/>
+          </g>
+          <defs>
+            <clipPath id="clip-bl"><rect x="0" y="100" width="100" height="100" /></clipPath>
+          </defs>
+        </svg>
+
+        <svg class="logo-piece piece-br" viewBox="0 0 200 200">
+          <g clip-path="url(#clip-br)">
+            <path d="M 15,100 H 45 L 52,88 L 60,112 L 68,95 L 75,100 H 85" stroke="#00d2ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 115,100 H 125 L 132,88 L 140,112 L 148,95 L 155,100 H 185" stroke="#00ffcc" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="70" y="25" width="60" height="150" rx="18" fill="none" stroke="url(#crossGradient)" stroke-width="6"/>
+            <rect x="25" y="70" width="150" height="60" rx="18" fill="none" stroke="url(#crossGradient)" stroke-width="6"/>
+            <path d="M 100,50 C 94,42 84,44 84,52 C 84,60 100,70 100,70 C 100,70 116,60 116,52 C 116,44 106,42 100,50 Z" fill="#00d2ff"/>
+            <path d="M 89,53 H 95 L 97,49 L 100,57 L 103,51 L 105,53 H 111" stroke="#010810" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="50" y="112" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#00d2ff" text-anchor="middle">S</text>
+            <circle cx="100" cy="100" r="24" fill="#010810" stroke="#ff3344" stroke-width="4"/>
+            <path d="M 85,100 H 91 L 94,91 L 100,109 L 106,93 L 109,100 H 115" stroke="#ff3344" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="150" y="112" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#00ffcc" text-anchor="middle">S</text>
+            <path d="M 86,148 C 90,144 95,145 100,148 C 105,145 110,144 114,148 C 112,154 100,158 100,158 C 100,158 88,154 86,148 Z" fill="#00ffcc"/>
+            <path d="M 97,135 H 103 V 145 H 97 Z M 94,138 H 106 V 142 H 94 Z" fill="#00ffcc"/>
+          </g>
+          <defs>
+            <clipPath id="clip-br"><rect x="100" y="100" width="100" height="100" /></clipPath>
+          </defs>
+        </svg>
+
+      </div>
+
+      <div class="double-tap-hint">Double Tap Logo for Emergency</div>
+
+      <div class="text-container">
+        <div class="brand-title">
+          <span class="medi">MEDI</span><span class="find">FIND</span>
+        </div>
+
+        <div class="brand-tagline">
+          Healthcare. Discovered.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="emergency-status" id="emergencyStatus">
+      <span>🚨 EMERGENCY AMBULANCE REQUESTED</span>
+    </div>
+
+  </div>
+
+  <script>
+    const emergencyBtn = document.getElementById('emergencyBtn');
+    const appContainer = document.getElementById('appContainer');
+    const emergencyStatus = document.getElementById('emergencyStatus');
+
+    let lastTap = 0;
+
+    emergencyBtn.addEventListener('click', (e) => {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTap;
+
+      // Detect Double Tap / Double Click within 400ms
+      if (tapLength < 400 && tapLength > 0) {
+        triggerEmergency();
+        e.preventDefault();
+      }
+      lastTap = currentTime;
+    });
+
+    function triggerEmergency() {
+      appContainer.classList.add('emergency-active');
+      emergencyStatus.classList.add('show');
+      
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200, 100, 400]);
+      }
+    }
+  </script>
+
+</body>
+</html>
