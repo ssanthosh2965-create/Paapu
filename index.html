@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MEDIFIND</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      background-color: #030712;
+      font-family: 'Inter', sans-serif;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .app-container {
+      width: 100vw;
+      height: 100vh;
+      background: #030712;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* BRAND CONTAINER */
+    .brand-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      z-index: 2;
+    }
+
+    /* CIRCULAR LOGO BUTTON WRAPPER */
+    .logo-wrapper {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 50%;
+      overflow: hidden; /* Clips all square active states to circle */
+      background-color: transparent;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .logo-wrapper:active {
+      transform: scale(0.95);
+    }
+
+    /* ROTATING DASHED RING */
+    .logo-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px dashed #00e5ff;
+      opacity: 0;
+      animation: ringFadeIn 0.5s ease-out 1.2s forwards, spinRing 12s linear 1.2s infinite;
+    }
+
+    @keyframes ringFadeIn {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes spinRing {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* SVG PIECE CONTAINER WITH STRICT CIRCLE CLIP */
+    .logo-piece {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      will-change: transform, opacity;
+      animation-duration: 1.2s;
+      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+      animation-fill-mode: forwards;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .piece-tl { opacity: 0; animation-name: flyTopLeft; }
+    @keyframes flyTopLeft {
+      0% { opacity: 0; transform: translate(-300px, -300px) rotate(-360deg) scale(0.3); }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    .piece-tr { opacity: 0; animation-name: flyTopRight; }
+    @keyframes flyTopRight {
+      0% { opacity: 0; transform: translate(300px, -300px) rotate(360deg) scale(0.3); }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    .piece-bl { opacity: 0; animation-name: flyBottomLeft; }
+    @keyframes flyBottomLeft {
+      0% { opacity: 0; transform: translate(-300px, 300px) rotate(360deg) scale(0.3); }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    .piece-br { opacity: 0; animation-name: flyBottomRight; }
+    @keyframes flyBottomRight {
+      0% { opacity: 0; transform: translate(300px, 300px) rotate(-360deg) scale(0.3); }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    /* ANIMATED ECG GRAPH */
+    .center-ecg-line {
+      stroke-dasharray: 60;
+      stroke-dashoffset: 60;
+      animation: ecgFlow 1.1s linear infinite;
+    }
+
+    @keyframes ecgFlow {
+      0% { stroke-dashoffset: 60; }
+      100% { stroke-dashoffset: -60; }
+    }
+
+    .double-tap-hint {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #00ffcc;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: textReveal 0.8s ease-out 1.1s forwards;
+      background: transparent;
+      border: 1.5px solid #00ffcc;
+      padding: 8px 20px;
+      border-radius: 20px;
+    }
+
+    .text-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      animation: textReveal 0.8s ease-out 1.1s forwards;
+    }
+
+    @keyframes textReveal {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-title {
+      font-size: 3.2rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      line-height: 1;
+      display: flex;
+    }
+
+    .brand-title .medi { color: #00e5ff; }
+    .brand-title .find { color: #00ffcc; }
+
+    .brand-tagline {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 3.5px;
+      color: #ffffff;
+      opacity: 0.9;
+      text-transform: uppercase;
+    }
+
+    /* FULL SOLID RED BLINKING EMERGENCY BACKGROUND */
+    .app-container.emergency-active {
+      animation: fullRedBlink 0.3s steps(1, end) infinite;
+    }
+
+    @keyframes fullRedBlink {
+      0%, 100% { background-color: #ff0000; }
+      50% { background-color: #030712; }
+    }
+
+    .emergency-status {
+      position: absolute;
+      bottom: 45px;
+      background: #ffffff;
+      border: 2px solid #000000;
+      padding: 12px 24px;
+      border-radius: 30px;
+      color: #ff0000;
+      font-weight: 900;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .emergency-status.show {
+      display: flex;
+      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container" id="appContainer">
+
+    <div class="brand-section">
+      
+      <div class="logo-wrapper" id="emergencyBtn">
+        <div class="logo-ring"></div>
+
+        <svg class="logo-piece piece-tl" viewBox="0 0 200 200">
+          <defs>
+            <linearGradient id="sharpCrossGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00e5ff"/>
+              <stop offset="100%" stop-color="#00ffcc"/>
+            </linearGradient>
+            <clipPath id="circleClipTL">
+              <circle cx="100" cy="100" r="99" />
+            </clipPath>
+            <clipPath id="clip-tl"><rect x="0" y="0" width="100" height="100" /></clipPath>
+          </defs>
+          <g clip-path="url(#circleClipTL)">
+            <g clip-path="url(#clip-tl)">
+              <path d="M 72,26 H 128 V 72 H 174 V 128 H 128 V 174 H 72 V 128 H 26 V 72 H 72 Z" fill="none" stroke="url(#sharpCrossGrad)" stroke-width="7"/>
+              <path d="M 100,49 C 95,40 84,42 84,51 C 84,60 100,70 100,70 C 100,70 116,60 116,51 C 116,42 105,40 100,49 Z" fill="#00e5ff"/>
+              <text x="49" y="113" font-family="'Inter', sans-serif" font-weight="900" font-size="38" fill="#00e5ff" text-anchor="middle">S</text>
+              <circle cx="100" cy="100" r="18" fill="#030712" stroke="#ff0033" stroke-width="4.5"/>
+              <path d="M 85,100 H 90 L 93,92 L 98,108 L 103,93 L 106,100 H 115" stroke="#ff0033" stroke-width="2.8" fill="none" class="center-ecg-line"/>
+              <text x="151" y="113" font-family="'Inter', sans-serif" font-weight="900" font-size="38" fill="#00ffcc" text-anchor="middle">S</text>
+            </g>
+          </g>
+        </svg>
+
+        <svg class="logo-piece piece-tr" viewBox="0 0 200 200">
+          <defs>
+            <clipPath id="circleClipTR">
+              <circle cx="100" cy="100" r="99" />
+            </clipPath>
+            <clipPath id="clip-tr"><rect x="100" y="0" width="100" height="100" /></clipPath>
+          </defs>
+          <g clip-path="url(#circleClipTR)">
+            <g clip-path="url(#clip-tr)">
+              <path d="M 72,26 H 128 V 72 H 174 V 128 H 128 V 174 H 72 V 128 H 26 V 72 H 72 Z" fill="none" stroke="url(#sharpCrossGrad)" stroke-width="7"/>
+              <path d="M 100,49 C 95,40 84,42 84,51 C 84,60 100,70 100,70 C 100,70 116,60 116,51 C 116,42 105,40 100,49 Z" fill="#00e5ff"/>
+              <text x="49" y="113" font-family="'Inter', sans-serif" font-weight="900" font-size="38" fill="#00e5ff" text-anchor="middle">S</text>
+              <circle cx="100" cy="100" r="18" fill="#030712" stroke="#ff0033" stroke-width="4.5"/>
+              <path d="M 85,100 H 90 L 93,92 L 98,108 L 103,93 L 106,100 H 115" stroke="#ff0033" stroke-width="2.8" fill="none" class="center-ecg-line"/>
+              <text x="151" y="113" font-family="'Inter', sans-serif" font-weight="900" font-size="38" fill="#00ffcc" text-anchor="middle">S</text>
+            </g>
+          </g>
+        </svg>
+
+        <svg class="logo-piece piece-bl" viewBox="0 0 200 200">
+          <defs>
+            <clipPath id="circleClipBL">
+              <circle cx="100" cy="100" r="99" />
+            </clipPath>
+            <clipPath id="clip-bl"><rect x="0" y="100" width="100" height="100" /></clipPath>
+          </defs>
+          <g clip-path="url(#circleClipBL)">
+            <g clip-path="url(#clip-bl)">
+              <path d="M 72,26 H 128 V 72 H 174 V 128 H 128 V 174 H 72 V 128 H 26 V 72 H 72 Z" fill="none" stroke="url(#sharpCrossGrad)" stroke-width="7"/>
+              <text x="49" y="113" font-family="'Inter', sans-serif" font-weight="900" font-size="38" fill="#00e5ff" text-anchor="middle">S</text>
+              <circle cx="100" cy="100" r="18" fill="#030712" stroke="#ff0033" stroke-width="4.5"/>
+              <path d="M 85,100 H 90 L 93,92 L 98,108 L 103,93 L 106,100 H 115" stroke="#ff0033" stroke-width="2.8" fill="none" class="center-ecg-line"/>
+              <text x="151" y="113" font-family="'Inter', sans-serif" font-weight="900" font-size="38" fill="#00ffcc" text-anchor="middle">S</text>
+            </g>
+          </g>
+        </svg>
+
+        <svg class="logo-piece piece-br" viewBox="0 0 200 200">
+          <defs>
+            <clipPath id="circleClipBR">
+              <circle cx="100" cy="100" r="99" />
+            </clipPath>
+            <clipPath id="clip-br"><rect x="100" y="100" width="100" height="100" /></clipPath>
+          </defs>
+          <g clip-path="url(#circleClipBR)">
+            <g clip-path="url(#clip-br)">
+              <path d="M 72,26 H 128 V 72 H 174 V 128 H 128 V 174 H 72 V 128 H 26 V 72 H 72 Z" fill="none" stroke="url(#sharpCrossGrad)" stroke-width="7"/>
+              <text x="49" y="113" font-family="'Inter', sans-serif" font-weight="900" font-size="38" fill="#00e5ff" text-anchor="middle">S</text>
+              <circle cx="100" cy="100" r="18" fill="#030712" stroke="#ff0033" stroke-width="4.5"/>
+              <path d="M 85,100 H 90 L 93,92 L 98,108 L 103,93 L 106,100 H 115" stroke="#ff0033" stroke-width="2.8" fill="none" class="center-ecg-line"/>
+              <text x="151" y="113" font-family="'Inter', sans-serif" font-weight="900" font-size="38" fill="#00ffcc" text-anchor="middle">S</text>
+            </g>
+          </g>
+        </svg>
+
+      </div>
+
+      <div class="double-tap-hint">Double Tap Logo for Emergency</div>
+
+      <div class="text-container">
+        <div class="brand-title">
+          <span class="medi">MEDI</span><span class="find">FIND</span>
+        </div>
+        <div class="brand-tagline">Healthcare. Discovered.</div>
+      </div>
+
+    </div>
+
+    <div class="emergency-status" id="emergencyStatus">
+      <span>🚨 EMERGENCY AMBULANCE REQUESTED</span>
+    </div>
+
+  </div>
+
+  <script>
+    const emergencyBtn = document.getElementById('emergencyBtn');
+    const appContainer = document.getElementById('appContainer');
+    const emergencyStatus = document.getElementById('emergencyStatus');
+
+    let lastTap = 0;
+
+    emergencyBtn.addEventListener('click', (e) => {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTap;
+
+      if (tapLength < 400 && tapLength > 0) {
+        triggerEmergency();
+        e.preventDefault();
+      }
+      lastTap = currentTime;
+    });
+
+    function triggerEmergency() {
+      appContainer.classList.add('emergency-active');
+      emergencyStatus.classList.add('show');
+      
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200, 100, 400]);
+      }
+    }
+  </script>
+
+</body>
+</html>
