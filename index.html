@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MEDIFIND</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: #000000;
+      font-family: 'Inter', sans-serif;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .screen {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: none;
+      position: relative;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* LANDING SCREEN WITH IMAGE INTEGRATION */
+    #landing-screen {
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      background: #000000;
+      padding: 16px;
+      position: relative;
+    }
+
+    /* HERO IMAGE CONTAINER */
+    .hero-image-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      margin-bottom: 16px;
+    }
+
+    .hero-image-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    /* ACTION BUTTONS OVERLAY / SECTION */
+    .actions-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .emergency-banner {
+      width: 100%;
+      background: linear-gradient(135deg, #42060a 0%, #210204 100%);
+      border: 1px solid #ff3344;
+      border-radius: 22px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 4px 25px rgba(255, 0, 51, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .emergency-banner:active {
+      transform: scale(0.98);
+    }
+
+    .emergency-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .icon-box-red {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 51, 68, 0.2);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ff3344;
+      flex-shrink: 0;
+    }
+
+    .emergency-text h3 {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #ff4d5e;
+      line-height: 1.1;
+    }
+
+    .emergency-text p {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 2px;
+    }
+
+    .emergency-arrow {
+      color: #ff4d5e;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .enter-btn {
+      width: 100%;
+      padding: 16px;
+      font-family: 'Newsreader', serif;
+      font-size: 1.35rem;
+      font-style: italic;
+      font-weight: 700;
+      color: #010603;
+      background: linear-gradient(180deg, #00ff88 0%, #00cc6a 100%);
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
+      text-align: center;
+    }
+
+    .enter-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* DASHBOARD HOME SCREEN */
+    #home-screen {
+      flex-direction: column;
+      background-color: #0d0f0e;
+      padding: 24px 16px;
+      gap: 20px;
+    }
+
+    .header-user {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .greeting p {
+      font-size: 0.85rem;
+      color: #8e9a92;
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+    }
+
+    .greeting h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #ffffff;
+      font-family: 'Newsreader', serif;
+    }
+
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1d2a23;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00ff88;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #1a0507;
+      border: 1px solid #ff3344;
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 0, 51, 0.4);
+    }
+
+    .modal-card h3 {
+      color: #ff3344;
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .modal-card p {
+      color: #d1d8d3;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .cancel-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <section id="landing-screen" class="screen active">
+    
+    <div class="hero-image-wrapper">
+      <img src="1000037070.png" alt="MEDIFIND Interface Mockup">
+    </div>
+
+    <div class="actions-section">
+      <div class="emergency-banner" onclick="triggerEmergency()">
+        <div class="emergency-left">
+          <div class="icon-box-red">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="6" width="15" height="11" rx="2"></rect>
+              <path d="M16 8h4l3 3v6h-7V8z"></path>
+              <circle cx="5.5" cy="17.5" r="2.5"></circle>
+              <circle cx="18.5" cy="17.5" r="2.5"></circle>
+              <path d="M8 10h4"></path>
+              <path d="M10 8v4"></path>
+            </svg>
+          </div>
+          <div class="emergency-text">
+            <h3>Emergency connect</h3>
+            <p>One tap ambulance request</p>
+          </div>
+        </div>
+        <div class="emergency-arrow">›</div>
+      </div>
+
+      <button id="enter-btn" class="enter-btn">Enter System</button>
+    </div>
+
+  </section>
+
+  <section id="home-screen" class="screen">
+    <div class="header-user">
+      <div class="greeting">
+        <p>Good morning</p>
+        <h2>Santhosh</h2>
+      </div>
+      <div class="profile-avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+    </div>
+
+    <div class="emergency-banner" onclick="triggerEmergency()">
+      <div class="emergency-left">
+        <div class="icon-box-red">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="6" width="15" height="11" rx="2"></rect>
+            <path d="M16 8h4l3 3v6h-7V8z"></path>
+            <circle cx="5.5" cy="17.5" r="2.5"></circle>
+            <circle cx="18.5" cy="17.5" r="2.5"></circle>
+          </svg>
+        </div>
+        <div class="emergency-text">
+          <h3>Emergency connect</h3>
+          <p>One tap ambulance request</p>
+        </div>
+      </div>
+      <div class="emergency-arrow">›</div>
+    </div>
+  </section>
+
+  <div id="emergency-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h3>AMBULANCE REQUESTED</h3>
+      <p>Dispatching nearest emergency unit to your GPS location...</p>
+      <button class="cancel-btn" onclick="closeEmergency()">Cancel Request</button>
+    </div>
+  </div>
+
+  <script>
+    const landingScreen = document.getElementById('landing-screen');
+    const homeScreen = document.getElementById('home-screen');
+    const enterBtn = document.getElementById('enter-btn');
+    const modal = document.getElementById('emergency-modal');
+
+    enterBtn.addEventListener('click', () => {
+      landingScreen.classList.remove('active');
+      homeScreen.classList.add('active');
+    });
+
+    function triggerEmergency() {
+      modal.style.display = 'flex';
+    }
+
+    function closeEmergency() {
+      modal.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
