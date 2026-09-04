@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MEDIFIND</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Newsreader:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      background-color: #010402;
+      font-family: 'Inter', sans-serif;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       1. INTERACTIVE MODERN SPLASH SCREEN (2-SECOND INTRO)
+    ============================================================ */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 45%, #082d42 0%, #02111a 50%, #000508 100%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+    }
+
+    #splash-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Holographic Tech Glow Rings */
+    .splash-graphic-container {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tech-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px dashed rgba(0, 210, 255, 0.4);
+      animation: spin-ring 6s linear infinite;
+    }
+
+    .tech-ring-inner {
+      position: absolute;
+      width: 78%;
+      height: 78%;
+      border-radius: 50%;
+      border: 1 border-style: solid;
+      border: 1.5px solid rgba(0, 255, 204, 0.3);
+      border-top-color: #00d2ff;
+      border-bottom-color: #00ffcc;
+      animation: spin-ring-reverse 3s linear infinite;
+    }
+
+    @keyframes spin-ring {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spin-ring-reverse {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(-360deg); }
+    }
+
+    /* SVG Cross + Magnifier Logo Animation */
+    .animated-logo-svg {
+      width: 80px;
+      height: 80px;
+      z-index: 2;
+      animation: logo-entrance 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+    }
+
+    .svg-path-cross {
+      stroke: #00d2ff;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: draw-path 1.4s ease-in-out forwards;
+    }
+
+    .svg-path-glass {
+      stroke: #00ffcc;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: draw-path 1.4s ease-in-out 0.2s forwards;
+    }
+
+    .svg-star {
+      fill: #00ffcc;
+      opacity: 0;
+      transform: scale(0);
+      transform-origin: center;
+      animation: star-pop 0.5s ease-out 1s forwards;
+    }
+
+    @keyframes draw-path {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes star-pop {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes logo-entrance {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Sharp Intro Brand Title */
+    .splash-title-box {
+      margin-top: 24px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(15px);
+      animation: title-appear 0.6s ease-out 0.5s forwards;
+    }
+
+    .splash-title {
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      line-height: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .splash-title .medi-blue { color: #00d2ff; }
+    .splash-title .find-teal { color: #00ffcc; }
+
+    .splash-subtitle {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #ffffff;
+      margin-top: 10px;
+    }
+
+    @keyframes title-appear {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       2. FULL SCREEN EDGE-TO-EDGE MAIN APP UI
+    ============================================================ */
+    .app-container {
+      width: 100%;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 15%, #052617 0%, #010804 55%, #000000 100%);
+      padding: 32px 20px 28px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+    }
+
+    .app-container.active-app {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* 2.1 TOP LOGO AREA */
+    .brand-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .heart-logo {
+      width: 85px;
+      height: 85px;
+    }
+
+    .brand-title {
+      font-size: 3.1rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      line-height: 1;
+      display: flex;
+    }
+
+    .brand-title .medi { color: #00ff88; }
+    .brand-title .find { color: #ff3344; }
+
+    .brand-tagline {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #ffffff;
+      margin-top: 6px;
+    }
+
+    .brand-tagline span { color: #ff3344; }
+
+    /* 2.2 HEARTBEAT ECG GRAPH LINE */
+    .ecg-container {
+      width: 100%;
+      height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 15px 0 5px 0;
+      position: relative;
+    }
+
+    .ecg-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .ecg-bg-line {
+      stroke: rgba(0, 255, 136, 0.15);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .ecg-pulse-line {
+      stroke: #00ff88;
+      stroke-width: 3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: pulse-draw 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes pulse-draw {
+      0% { stroke-dashoffset: 600; opacity: 0.2; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 0.2; }
+    }
+
+    /* 2.3 MIDDLE GRAPHIC CARDS */
+    .hero-stage {
+      width: 100%;
+      max-width: 420px;
+      height: 210px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin: 5px 0;
+    }
+
+    .skyline {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      height: 100px;
+      background: repeating-linear-gradient(
+        90deg,
+        #06170f 0px,
+        #06170f 18px,
+        transparent 18px,
+        transparent 24px
+      );
+      border-top: 1px solid rgba(0, 255, 136, 0.2);
+      opacity: 0.6;
+      mask-image: linear-gradient(to top, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
+    }
+
+    .hero-composition {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .phone-mockup {
+      width: 85px;
+      height: 150px;
+      background: #040d08;
+      border: 2px solid #00ff88;
+      border-radius: 16px;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-6deg) translateY(-8px);
+      flex-shrink: 0;
+    }
+
+    .phone-mockup .pin-icon { color: #ff3344; }
+
+    .phone-mockup p {
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #e0f2fe;
+      text-align: center;
+      line-height: 1.1;
+      margin-top: 6px;
+    }
+
+    .phone-mockup .mini-ambulance {
+      margin-top: 8px;
+      padding: 3px 6px;
+      background: rgba(255, 51, 68, 0.15);
+      border-radius: 6px;
+      border: 0.5px solid #ff3344;
+    }
+
+    .ambulance-center {
+      width: 175px;
+      height: 120px;
+      background: radial-gradient(circle, #0e2017 0%, #05120a 100%);
+      border: 2px solid #00ff88;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .beacon-light {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      width: 12px;
+      height: 12px;
+      background: #ff3344;
+      border-radius: 50%;
+      animation: blink 0.8s infinite alternate;
+      z-index: 10;
+    }
+
+    @keyframes blink {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+
+    .center-svg-graphic {
+      width: 65px;
+      height: 65px;
+    }
+
+    .shield-mockup {
+      width: 75px;
+      height: 90px;
+      background: linear-gradient(145deg, #0a2d1d 0%, #03140c 100%);
+      border: 2px solid #00ff88;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(6deg) translateY(-12px);
+      flex-shrink: 0;
+    }
+
+    /* 2.4 BUTTONS SECTION */
+    .action-group {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .emergency-button {
+      width: 100%;
+      background: linear-gradient(135deg, #3d0508 0%, #1a0204 100%);
+      border: 1.5px solid #ff3344;
+      border-radius: 28px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .emergency-button:active { transform: scale(0.98); }
+
+    .emergency-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .red-icon-box {
+      width: 46px;
+      height: 46px;
+      background: rgba(255, 51, 68, 0.22);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ff3344;
+      flex-shrink: 0;
+    }
+
+    .emergency-text h3 {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #ff4d5e;
+      line-height: 1.1;
+    }
+
+    .emergency-text p {
+      font-size: 0.8rem;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .arrow-icon {
+      color: #ff4d5e;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .enter-system-btn {
+      width: 100%;
+      padding: 16px;
+      font-family: 'Newsreader', serif;
+      font-size: 1.45rem;
+      font-style: italic;
+      font-weight: 700;
+      color: #000000;
+      background: linear-gradient(180deg, #00ff88 0%, #00cc6a 100%);
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.15s;
+    }
+
+    .enter-system-btn:active { transform: scale(0.98); }
+
+    /* 2.5 FOOTER TAGLINE */
+    .footer-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #00ff88;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="splash-screen">
+    <div class="splash-graphic-container">
+      <div class="tech-ring"></div>
+      <div class="tech-ring-inner"></div>
+      
+      <svg class="animated-logo-svg" viewBox="0 0 100 100">
+        <path class="svg-path-cross" d="M 40 18 H 60 V 40 H 82 V 60 H 60 V 82 H 40 V 60 H 18 V 40 H 40 Z"/>
+        <circle class="svg-path-glass" cx="50" cy="50" r="24"/>
+        <polygon class="svg-star" points="50,38 53,47 62,50 53,53 50,62 47,53 38,50 47,47"/>
+      </svg>
+    </div>
+
+    <div class="splash-title-box">
+      <div class="splash-title">
+        <span class="medi-blue">MEDI</span><span class="find-teal">FIND</span>
+      </div>
+      <div class="splash-subtitle">HEALTHCARE. DISCOVERED.</div>
+    </div>
+  </div>
+
+  <div id="main-app" class="app-container">
+
+    <div class="brand-section">
+      <svg class="heart-logo" viewBox="0 0 100 100" fill="none">
+        <path d="M50 86C50 86 16 60 16 34 C16 20 28 10 41 10 C49 10 50 16 50 16 C50 16 51 10 59 10 C72 10 84 20 84 34 C84 60 50 86 50 86Z" stroke="#00ff88" stroke-width="6" fill="none"/>
+        <path d="M26 42 H40 L44 30 L50 54 L56 38 L60 42 H74" stroke="#00ff88" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M72 16 V28 M66 22 H78" stroke="#ff3344" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-title">
+        <span class="medi">MEDI</span><span class="find">FIND</span>
+      </div>
+      <div class="brand-tagline">
+        FIND CARE. SAVE TIME. <span>SAVE LIVES.</span>
+      </div>
+    </div>
+
+    <div class="ecg-container">
+      <svg class="ecg-svg" viewBox="0 0 400 60" preserveAspectRatio="none">
+        <path class="ecg-bg-line" d="M 0 30 L 130 30 L 140 18 L 150 42 L 165 5 L 180 55 L 195 22 L 205 35 L 215 30 L 400 30" />
+        <path class="ecg-pulse-line" d="M 0 30 L 130 30 L 140 18 L 150 42 L 165 5 L 180 55 L 195 22 L 205 35 L 215 30 L 400 30" />
+      </svg>
+    </div>
+
+    <div class="hero-stage">
+      <div class="skyline"></div>
+      <div class="hero-composition">
+        
+        <div class="phone-mockup">
+          <svg class="pin-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          <p>Nearest Ambulance On the Way</p>
+          <div class="mini-ambulance">
+            <svg width="20" height="12" viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="2">
+              <rect x="1" y="6" width="15" height="11" rx="2"></rect>
+              <path d="M16 8h4l3 3v6h-7V8z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ambulance-center">
+          <div class="beacon-light"></div>
+          <svg class="center-svg-graphic" viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="6" width="15" height="11" rx="2"></rect>
+            <path d="M16 8h4l3 3v6h-7V8z"></path>
+            <circle cx="5.5" cy="17.5" r="2.5" fill="#000"></circle>
+            <circle cx="18.5" cy="17.5" r="2.5" fill="#000"></circle>
+            <path d="M8 10h4" stroke="#ff3344" stroke-width="2"></path>
+            <path d="M10 8v4" stroke="#ff3344" stroke-width="2"></path>
+          </svg>
+        </div>
+
+        <div class="shield-mockup">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M12 8v8M8 12h8" stroke="#00ff88" stroke-width="2"/>
+          </svg>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="action-group">
+      <div class="emergency-button">
+        <div class="emergency-left">
+          <div class="red-icon-box">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="6" width="15" height="11" rx="2"></rect>
+              <path d="M16 8h4l3 3v6h-7V8z"></path>
+              <circle cx="5.5" cy="17.5" r="2.5"></circle>
+              <circle cx="18.5" cy="17.5" r="2.5"></circle>
+              <path d="M8 10h4"></path>
+              <path d="M10 8v4"></path>
+            </svg>
+          </div>
+          <div class="emergency-text">
+            <h3>Emergency connect</h3>
+            <p>One tap ambulance request</p>
+          </div>
+        </div>
+        <div class="arrow-icon">›</div>
+      </div>
+
+      <button class="enter-system-btn">Enter System</button>
+    </div>
+
+    <div class="footer-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>Your Health. Our Priority.</span>
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // 2.0 Second timer for Intro animation to finish
+      setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        const mainApp = document.getElementById('main-app');
+
+        splash.classList.add('fade-out');
+        mainApp.classList.add('active-app');
+      }, 2000);
+    });
+  </script>
+
+</body>
+</html>
