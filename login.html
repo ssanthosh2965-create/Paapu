@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediFind — Sign In</title>
+<style>
+  :root{
+    --bg: #05080d;
+    --panel: #0c1119;
+    --panel-border: #1b2430;
+    --cyan: #29d9f5;
+    --teal: #21e8b0;
+    --red: #ef3b3b;
+    --text: #eaf6f6;
+    --muted: #7d8b94;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 50% -10%, rgba(41,217,245,0.10), transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(33,232,176,0.06), transparent 40%);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  /* ---- back arrow, top left ---- */
+  .back-btn{
+    position: fixed;
+    top: 18px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--panel-border);
+    color: var(--text);
+    text-decoration: none;
+    z-index: 10;
+    transition: background .15s ease, transform .12s ease;
+  }
+  .back-btn:hover{ background: rgba(255,255,255,0.08); }
+  .back-btn:active{ transform: scale(0.92); }
+  .back-btn svg{ width: 20px; height: 20px; }
+
+  .screen{
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px 40px;
+  }
+
+  /* ---- compact logo mark, echoes the splash screen ---- */
+  .mark{
+    width: 84px;
+    height: 84px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .mark svg{ width: 100%; height: 100%; }
+
+  .brand{
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: 0.5px;
+    margin: 0;
+  }
+  .brand span.find{ color: var(--teal); }
+  .brand span.medi{ color: var(--cyan); }
+
+  .tagline{
+    margin: 4px 0 28px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ---- card ---- */
+  .card{
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 30px 24px 26px;
+    text-align: center;
+  }
+
+  .card h1{
+    font-size: 19px;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+  .card p.sub{
+    margin: 0 0 26px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .btn-primary{
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #04141a;
+    background: linear-gradient(90deg, var(--cyan), var(--teal));
+    cursor: pointer;
+    transition: transform .12s ease, filter .12s ease;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .coming-soon-tag{
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .divider{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0 18px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .divider::before, .divider::after{
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--panel-border);
+  }
+
+  .secondary-link-btn{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--panel-border);
+    background: rgba(255,255,255,0.02);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 13.5px;
+    letter-spacing: 0.2px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .secondary-link-btn:hover{ background: rgba(255,255,255,0.05); }
+</style>
+</head>
+<body>
+
+<!-- Back arrow: returns to the logo/splash page -->
+<a href="index.html" class="back-btn" id="backBtn" aria-label="Back to home">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 18l-6-6 6-6"/>
+  </svg>
+</a>
+
+<div class="screen">
+
+  <div class="mark" aria-hidden="true">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#29d9f5" stroke-width="1.6" stroke-dasharray="3 4"/>
+      <path d="M42 12 H58 V38 H86 V54 H58 V82 H42 V54 H12 V38 H42 Z"
+            fill="none" stroke="#21e8b0" stroke-width="4.5" stroke-linejoin="round"/>
+      <circle cx="50" cy="50" r="12" fill="none" stroke="#ef3b3b" stroke-width="3"/>
+      <path d="M45 50 L49 42 L52 54 L55 47" fill="none" stroke="#ef3b3b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <h2 class="brand"><span class="medi">MEDI</span><span class="find">FIND</span></h2>
+  <div class="tagline">Healthcare. Discovered.</div>
+
+  <div class="card">
+    <h1>Welcome back</h1>
+    <p class="sub">Sign in is being set up for MediFind.<br>Check back soon.</p>
+
+    <button class="btn-primary" disabled>Sign in</button>
+    <div class="coming-soon-tag">Coming soon</div>
+
+    <div class="divider">or</div>
+
+    <a href="index.html" class="secondary-link-btn">
+      Continue without signing in
+    </a>
+  </div>
+
+</div>
+
+</body>
+</html>
